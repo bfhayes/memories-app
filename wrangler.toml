@@ -10,7 +10,7 @@ compatibility_flags = ["nodejs_compat"]
 [[d1_databases]]
 binding = "DB"
 database_name = "memories-app"
-database_id = "REPLACE_WITH_D1_ID"
+database_id = "f9f8930a-ed8a-4949-8033-24be62a2d493"
 
 [[r2_buckets]]
 binding = "IMAGES"
