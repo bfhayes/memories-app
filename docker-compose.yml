@@ -1,0 +1,28 @@
+services:
+  frontend:
+    build: .
+    command: npm run dev:frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/src:/app/frontend/src
+      - ./frontend/public:/app/frontend/public
+      - ./frontend/index.html:/app/frontend/index.html
+      - ./frontend/vite.config.ts:/app/frontend/vite.config.ts
+      - ./frontend/tsconfig.json:/app/frontend/tsconfig.json
+    environment:
+      - API_URL=http://api:8788
+    depends_on:
+      - api
+
+  api:
+    build: .
+    command: npx wrangler pages dev --ip 0.0.0.0 --port 8788 --d1 DB=memories-app --r2 IMAGES=memories-app-images --binding AUTH_SECRET=dev-secret-do-not-use-in-production --persist-to /data
+    volumes:
+      - ./functions:/app/functions
+      - ./wrangler.toml:/app/wrangler.toml
+      - ./migrations:/app/migrations
+      - d1-data:/data
+
+volumes:
+  d1-data:

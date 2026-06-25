@@ -1,0 +1,18 @@
+name = "memories-app"
+pages_build_output_dir = "frontend/dist"
+compatibility_date = "2026-04-01"
+compatibility_flags = ["nodejs_compat"]
+
+# AUTH_SECRET is set as a secret via:
+#   wrangler pages secret put AUTH_SECRET
+# It signs the per-Memory access cookie. In local dev it is passed via --binding.
+
+[[d1_databases]]
+binding = "DB"
+database_name = "memories-app"
+database_id = "REPLACE_WITH_D1_ID"
+
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "memories-app-images"
+preview_bucket_name = "memories-app-images-dev"

@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta name="design_doc_mode" content="canvas">
+<style>
+  *{box-sizing:border-box;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  body{margin:0;font-family:'Hanken Grotesk',system-ui,sans-serif}
+</style>
+</helmet>
+
+<!-- ============ MEMORIES HUB ============ -->
+<div style="position:absolute;left:0;top:0;width:412px">
+  <div data-drags-parent="1" style="font:700 13px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#9a8f80;margin:0 0 16px 8px">Memories · pick one</div>
+  <div style="width:412px;height:862px;background:#191613;border-radius:56px;padding:11px;box-shadow:0 30px 60px -18px rgba(45,30,15,.4)">
+    <div data-screen-label="Memories" style="position:relative;width:390px;height:840px;background:#FAF6F0;border-radius:46px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="flex:0 0 auto;height:52px;display:flex;align-items:center;justify-content:space-between;padding:14px 30px 0;font:700 16px 'Hanken Grotesk';color:#2E2A26">
+        <span>9:41</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:flex;gap:2.5px;align-items:flex-end;height:11px">
+            <div style="width:3px;height:5px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:7px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:9px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:11px;background:#2E2A26;border-radius:1px"></div>
+          </div>
+          <div style="width:25px;height:12px;border:1.6px solid #2E2A26;border-radius:3.5px;padding:1.6px"><div style="width:68%;height:100%;background:#2E2A26;border-radius:1.5px"></div></div>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;padding:8px 24px 0">
+        <div style="display:flex;align-items:center;gap:11px;margin-top:8px">
+          <div style="width:36px;height:36px;border-radius:11px;background:#C4704F;display:flex;align-items:center;justify-content:center;font-size:19px">🌿</div>
+          <div>
+            <div style="font:800 17px 'Hanken Grotesk';color:#2E2A26;line-height:1.05">Memories</div>
+            <div style="font:600 12px 'Hanken Grotesk';color:#A79C8E">memories.bryanthayes.com</div>
+          </div>
+        </div>
+        <h1 style="margin:30px 0 12px;font:800 32px/1.12 'Hanken Grotesk';letter-spacing:-.02em;color:#2E2A26">Family Memories</h1>
+        <p style="margin:0 0 24px;font:500 17px/1.5 'Hanken Grotesk';color:#7A7066">Open a memory to add photos and share stories. Each one is private to the family who's invited.</p>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="background:#fff;border:1.5px solid #EBE1D2;border-radius:22px;padding:13px;display:flex;align-items:center;gap:14px;box-shadow:0 8px 20px rgba(60,45,30,.05)">
+            <div style="width:70px;height:70px;border-radius:16px;overflow:hidden;background:#C2B193;position:relative;flex:0 0 auto"><div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div></div>
+            <div style="flex:1;min-width:0">
+              <div style="font:800 21px 'Hanken Grotesk';color:#2E2A26">Jeff Rice</div>
+              <div style="font:500 15px 'Hanken Grotesk';color:#8A8178;margin-top:2px">1938 – 2024 · 1,204 photos</div>
+            </div>
+            <div style="width:38px;height:38px;border-radius:50%;background:#F0EAE0;display:flex;align-items:center;justify-content:center;font-size:17px;flex:0 0 auto">🔒</div>
+          </div>
+          <div style="background:#fff;border:1.5px solid #EBE1D2;border-radius:22px;padding:13px;display:flex;align-items:center;gap:14px;box-shadow:0 8px 20px rgba(60,45,30,.05)">
+            <div style="width:70px;height:70px;border-radius:16px;overflow:hidden;background:#94A3AC;position:relative;flex:0 0 auto"><div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div></div>
+            <div style="flex:1;min-width:0">
+              <div style="font:800 21px 'Hanken Grotesk';color:#2E2A26">The Lake House</div>
+              <div style="font:500 15px 'Hanken Grotesk';color:#8A8178;margin-top:2px">Summers 1960–1989 · 318 photos</div>
+            </div>
+            <div style="width:38px;height:38px;border-radius:50%;background:#F0EAE0;display:flex;align-items:center;justify-content:center;font-size:17px;flex:0 0 auto">🔒</div>
+          </div>
+          <div style="background:#fff;border:1.5px solid #EBE1D2;border-radius:22px;padding:13px;display:flex;align-items:center;gap:14px;box-shadow:0 8px 20px rgba(60,45,30,.05)">
+            <div style="width:70px;height:70px;border-radius:16px;overflow:hidden;background:#B59BA0;position:relative;flex:0 0 auto"><div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div></div>
+            <div style="flex:1;min-width:0">
+              <div style="font:800 21px 'Hanken Grotesk';color:#2E2A26">Jean's 90th</div>
+              <div style="font:500 15px 'Hanken Grotesk';color:#8A8178;margin-top:2px">2019 · 86 photos</div>
+            </div>
+            <div style="width:38px;height:38px;border-radius:50%;background:#F0EAE0;display:flex;align-items:center;justify-content:center;font-size:17px;flex:0 0 auto">🔒</div>
+          </div>
+        </div>
+        <div style="margin-top:auto;padding:22px 0 6px;display:flex;align-items:center;justify-content:center;gap:8px;color:#A79C8E;font:600 15px 'Hanken Grotesk'">🔒 Each memory is password-protected</div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;justify-content:center;padding:4px 0 11px"><div style="width:134px;height:5px;border-radius:3px;background:#2E2A26;opacity:.22"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PASSWORD GATE ============ -->
+<div style="position:absolute;left:502px;top:0;width:412px">
+  <div data-drags-parent="1" style="font:700 13px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#9a8f80;margin:0 0 16px 8px">Password gate · private</div>
+  <div style="width:412px;height:862px;background:#191613;border-radius:56px;padding:11px;box-shadow:0 30px 60px -18px rgba(45,30,15,.4)">
+    <div data-screen-label="Enter password" style="position:relative;width:390px;height:840px;background:#FAF6F0;border-radius:46px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="flex:0 0 auto;height:52px;display:flex;align-items:center;justify-content:space-between;padding:14px 30px 0;font:700 16px 'Hanken Grotesk';color:#2E2A26">
+        <span>9:41</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:flex;gap:2.5px;align-items:flex-end;height:11px">
+            <div style="width:3px;height:5px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:7px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:9px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:11px;background:#2E2A26;border-radius:1px"></div>
+          </div>
+          <div style="width:25px;height:12px;border:1.6px solid #2E2A26;border-radius:3.5px;padding:1.6px"><div style="width:68%;height:100%;background:#2E2A26;border-radius:1.5px"></div></div>
+        </div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;align-items:center;gap:12px;padding:4px 20px 6px">
+        <div style="width:44px;height:44px;border-radius:14px;background:#fff;border:1.5px solid #EBE1D2;display:flex;align-items:center;justify-content:center;font:400 26px/1 'Hanken Grotesk';color:#2E2A26;padding-bottom:4px">‹</div>
+        <span style="font:700 16px 'Hanken Grotesk';color:#7A7066">All memories</span>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:16px 30px 0">
+        <div style="width:96px;height:96px;border-radius:24px;overflow:hidden;background:#C2B193;position:relative"><div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div></div>
+        <div style="margin-top:16px;font:800 25px 'Hanken Grotesk';color:#2E2A26">Jeff Rice</div>
+        <div style="font:500 15px 'Hanken Grotesk';color:#8A8178;margin-top:3px">1938 – 2024 · 1,204 photos</div>
+        <div style="margin-top:22px;width:60px;height:60px;border-radius:50%;background:#F0EAE0;display:flex;align-items:center;justify-content:center;font-size:28px">🔒</div>
+        <h2 style="margin:18px 0 8px;font:800 23px 'Hanken Grotesk';color:#2E2A26">This memory is private</h2>
+        <p style="margin:0;font:500 17px/1.5 'Hanken Grotesk';color:#7A7066">Enter the password a family member texted you.</p>
+        <div style="margin-top:22px;width:100%;height:64px;border-radius:16px;background:#fff;border:2px solid #C4704F;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 4px rgba(196,112,79,.12)">
+          <span style="font:800 24px 'Hanken Grotesk';letter-spacing:.32em;color:#2E2A26">••••</span>
+          <span style="width:2px;height:28px;background:#C4704F;margin-left:6px"></span>
+        </div>
+        <div style="margin-top:14px;width:100%;height:62px;border-radius:18px;background:#C4704F;display:flex;align-items:center;justify-content:center;color:#fff;font:800 19px 'Hanken Grotesk';box-shadow:0 12px 24px -6px rgba(196,112,79,.45)">Open Memory</div>
+        <div style="margin-top:16px;font:500 15px/1.45 'Hanken Grotesk';color:#A79C8E">Didn't get a password?<br>Ask whoever invited you to this memory.</div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;justify-content:center;padding:6px 0 11px"><div style="width:134px;height:5px;border-radius:3px;background:#2E2A26;opacity:.22"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ HOME ============ -->
+<div style="position:absolute;left:1004px;top:0;width:412px">
+  <div data-drags-parent="1" style="font:700 13px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#9a8f80;margin:0 0 16px 8px">Home</div>
+  <div style="width:412px;height:862px;background:#191613;border-radius:56px;padding:11px;box-shadow:0 30px 60px -18px rgba(45,30,15,.4)">
+    <div data-screen-label="Home" style="position:relative;width:390px;height:840px;background:#FAF6F0;border-radius:46px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="flex:0 0 auto;height:52px;display:flex;align-items:center;justify-content:space-between;padding:14px 30px 0;font:700 16px 'Hanken Grotesk';color:#2E2A26">
+        <span>9:41</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:flex;gap:2.5px;align-items:flex-end;height:11px">
+            <div style="width:3px;height:5px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:7px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:9px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:11px;background:#2E2A26;border-radius:1px"></div>
+          </div>
+          <div style="width:25px;height:12px;border:1.6px solid #2E2A26;border-radius:3.5px;padding:1.6px"><div style="width:68%;height:100%;background:#2E2A26;border-radius:1.5px"></div></div>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;padding:8px 26px 0">
+        <div style="display:flex;align-items:center;gap:12px;margin-top:6px">
+          <div style="width:42px;height:42px;border-radius:13px;background:#fff;border:1.5px solid #EBE1D2;display:flex;align-items:center;justify-content:center;font:400 24px/1 'Hanken Grotesk';color:#2E2A26;padding-bottom:3px">‹</div>
+          <div style="flex:1">
+            <div style="font:700 12px 'Hanken Grotesk';letter-spacing:.12em;text-transform:uppercase;color:#A79C8E">Memory</div>
+            <div style="font:800 19px 'Hanken Grotesk';color:#2E2A26">Jeff Rice</div>
+          </div>
+          <div style="width:42px;height:42px;border-radius:50%;background:#C2B193;position:relative;overflow:hidden"><div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div></div>
+        </div>
+        <div style="margin-top:40px">
+          <h1 style="margin:0 0 16px;font:800 34px/1.12 'Hanken Grotesk';letter-spacing:-.02em;color:#2E2A26">Help us remember Jeff</h1>
+          <p style="margin:0;font:500 18px/1.5 'Hanken Grotesk';color:#7A7066">Upload old family photos so we can keep them safe for everyone. You don't need to sort them now — you can always come back later.</p>
+        </div>
+        <div style="margin-top:32px;display:flex;flex-direction:column;gap:16px">
+          <div style="background:#C4704F;border-radius:24px;padding:24px 22px;display:flex;align-items:center;gap:18px;box-shadow:0 14px 28px -6px rgba(196,112,79,.45)">
+            <div style="width:62px;height:62px;border-radius:18px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:30px">📷</div>
+            <div>
+              <div style="font:800 23px 'Hanken Grotesk';color:#fff">Upload Photos</div>
+              <div style="font:500 16px 'Hanken Grotesk';color:rgba(255,255,255,.85);margin-top:3px">Add photos from your phone</div>
+            </div>
+          </div>
+          <div style="background:#fff;border:1.5px solid #EBE1D2;border-radius:24px;padding:24px 22px;display:flex;align-items:center;gap:18px;box-shadow:0 8px 20px rgba(60,45,30,.05)">
+            <div style="width:62px;height:62px;border-radius:18px;background:#F0EAE0;display:flex;align-items:center;justify-content:center;font-size:30px">🖼️</div>
+            <div>
+              <div style="font:800 23px 'Hanken Grotesk';color:#2E2A26">Photo Library</div>
+              <div style="font:500 16px 'Hanken Grotesk';color:#8A8178;margin-top:3px">Browse &amp; add details</div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:auto;padding:24px 0 6px;display:flex;align-items:center;justify-content:center;gap:8px;color:#A79C8E;font:600 15px 'Hanken Grotesk'">🔒 Private to your family</div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;justify-content:center;padding:6px 0 11px"><div style="width:134px;height:5px;border-radius:3px;background:#2E2A26;opacity:.22"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ UPLOAD — PROGRESS ============ -->
+<div style="position:absolute;left:1506px;top:0;width:412px">
+  <div data-drags-parent="1" style="font:700 13px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#9a8f80;margin:0 0 16px 8px">Upload · in progress</div>
+  <div style="width:412px;height:862px;background:#191613;border-radius:56px;padding:11px;box-shadow:0 30px 60px -18px rgba(45,30,15,.4)">
+    <div data-screen-label="Upload progress" style="position:relative;width:390px;height:840px;background:#FAF6F0;border-radius:46px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="flex:0 0 auto;height:52px;display:flex;align-items:center;justify-content:space-between;padding:14px 30px 0;font:700 16px 'Hanken Grotesk';color:#2E2A26">
+        <span>9:41</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:flex;gap:2.5px;align-items:flex-end;height:11px">
+            <div style="width:3px;height:5px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:7px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:9px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:11px;background:#2E2A26;border-radius:1px"></div>
+          </div>
+          <div style="width:25px;height:12px;border:1.6px solid #2E2A26;border-radius:3.5px;padding:1.6px"><div style="width:68%;height:100%;background:#2E2A26;border-radius:1.5px"></div></div>
+        </div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:6px 22px 12px">
+        <div style="width:44px;height:44px;border-radius:14px;background:#fff;border:1.5px solid #EBE1D2;display:flex;align-items:center;justify-content:center;font:400 26px/1 'Hanken Grotesk';color:#2E2A26;padding-bottom:4px">‹</div>
+        <span style="font:800 23px 'Hanken Grotesk';color:#2E2A26">Uploading</span>
+      </div>
+      <div style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+        <div style="margin:2px 22px 0;background:#fff;border:1.5px solid #EFE6D8;border-radius:22px;padding:22px;box-shadow:0 8px 20px rgba(60,45,30,.05)">
+          <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <span style="font:800 22px 'Hanken Grotesk';color:#2E2A26">Uploading…</span>
+            <span style="font:800 18px 'Hanken Grotesk';color:#C4704F">19%</span>
+          </div>
+          <div style="font:500 16px 'Hanken Grotesk';color:#8A8178;margin:5px 0 16px">23 of 118 photos complete</div>
+          <div style="height:14px;border-radius:8px;background:#F0EAE0;overflow:hidden">
+            <div style="width:19%;height:100%;background:#C4704F;border-radius:8px"></div>
+          </div>
+        </div>
+        <div style="font:700 13px 'Hanken Grotesk';letter-spacing:.12em;text-transform:uppercase;color:#A79C8E;margin:24px 24px 12px">This batch</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:13px;padding:0 22px">
+          <div style="position:relative;height:150px;border-radius:16px;overflow:hidden;background:#9FA487">
+            <div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div>
+            <div style="position:absolute;inset:0;background:rgba(25,22,18,.45);display:flex;align-items:center;justify-content:center">
+              <div style="width:48px;height:48px;border-radius:50%;background:conic-gradient(#fff 65%,rgba(255,255,255,.3) 0);display:flex;align-items:center;justify-content:center"><div style="width:34px;height:34px;border-radius:50%;background:#2c2822"></div></div>
+            </div>
+          </div>
+          <div style="position:relative;height:150px;border-radius:16px;overflow:hidden;background:#C9A28B">
+            <div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div>
+            <div style="position:absolute;inset:0;background:rgba(25,22,18,.45);display:flex;align-items:center;justify-content:center">
+              <div style="width:48px;height:48px;border-radius:50%;background:conic-gradient(#fff 38%,rgba(255,255,255,.3) 0);display:flex;align-items:center;justify-content:center"><div style="width:34px;height:34px;border-radius:50%;background:#2c2822"></div></div>
+            </div>
+          </div>
+          <div style="position:relative;height:150px;border-radius:16px;overflow:hidden;background:#94A3AC">
+            <div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div>
+            <div style="position:absolute;top:9px;right:9px;width:28px;height:28px;border-radius:50%;background:#7A8B6F;display:flex;align-items:center;justify-content:center;color:#fff;font:800 15px 'Hanken Grotesk';box-shadow:0 2px 6px rgba(0,0,0,.25)">✓</div>
+          </div>
+          <div style="position:relative;height:150px;border-radius:16px;overflow:hidden;background:#C2B193">
+            <div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div>
+            <div style="position:absolute;top:9px;right:9px;width:28px;height:28px;border-radius:50%;background:#7A8B6F;display:flex;align-items:center;justify-content:center;color:#fff;font:800 15px 'Hanken Grotesk';box-shadow:0 2px 6px rgba(0,0,0,.25)">✓</div>
+          </div>
+          <div style="position:relative;height:150px;border-radius:16px;overflow:hidden;background:#B59BA0">
+            <div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div>
+            <div style="position:absolute;top:9px;right:9px;width:28px;height:28px;border-radius:50%;background:#7A8B6F;display:flex;align-items:center;justify-content:center;color:#fff;font:800 15px 'Hanken Grotesk';box-shadow:0 2px 6px rgba(0,0,0,.25)">✓</div>
+          </div>
+          <div style="position:relative;height:150px;border-radius:16px;overflow:hidden;background:#A8B69C">
+            <div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div>
+            <div style="position:absolute;top:9px;right:9px;width:28px;height:28px;border-radius:50%;background:#7A8B6F;display:flex;align-items:center;justify-content:center;color:#fff;font:800 15px 'Hanken Grotesk';box-shadow:0 2px 6px rgba(0,0,0,.25)">✓</div>
+          </div>
+        </div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;justify-content:center;padding:6px 0 11px"><div style="width:134px;height:5px;border-radius:3px;background:#2E2A26;opacity:.22"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ UPLOAD — SUCCESS ============ -->
+<div style="position:absolute;left:2008px;top:0;width:412px">
+  <div data-drags-parent="1" style="font:700 13px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#9a8f80;margin:0 0 16px 8px">Upload · done</div>
+  <div style="width:412px;height:862px;background:#191613;border-radius:56px;padding:11px;box-shadow:0 30px 60px -18px rgba(45,30,15,.4)">
+    <div data-screen-label="Upload success" style="position:relative;width:390px;height:840px;background:#FAF6F0;border-radius:46px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="flex:0 0 auto;height:52px;display:flex;align-items:center;justify-content:space-between;padding:14px 30px 0;font:700 16px 'Hanken Grotesk';color:#2E2A26">
+        <span>9:41</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:flex;gap:2.5px;align-items:flex-end;height:11px">
+            <div style="width:3px;height:5px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:7px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:9px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:11px;background:#2E2A26;border-radius:1px"></div>
+          </div>
+          <div style="width:25px;height:12px;border:1.6px solid #2E2A26;border-radius:3.5px;padding:1.6px"><div style="width:68%;height:100%;background:#2E2A26;border-radius:1.5px"></div></div>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 36px">
+        <div style="width:108px;height:108px;border-radius:50%;background:#7A8B6F;display:flex;align-items:center;justify-content:center;font-size:54px;color:#fff;box-shadow:0 18px 36px -8px rgba(122,139,111,.55)">✓</div>
+        <h1 style="margin:32px 0 12px;font:800 30px/1.15 'Hanken Grotesk';letter-spacing:-.01em;color:#2E2A26">Your photos are safely saved</h1>
+        <p style="margin:0;font:500 18px/1.5 'Hanken Grotesk';color:#7A7066">118 photos added to your family archive. Thank you for helping preserve them.</p>
+      </div>
+      <div style="flex:0 0 auto;padding:0 26px 6px;display:flex;flex-direction:column;gap:13px">
+        <div style="height:62px;border-radius:18px;background:#C4704F;display:flex;align-items:center;justify-content:center;color:#fff;font:800 19px 'Hanken Grotesk';box-shadow:0 12px 24px -6px rgba(196,112,79,.45)">Go to Library</div>
+        <div style="height:62px;border-radius:18px;background:#fff;border:1.5px solid #E3D8C8;display:flex;align-items:center;justify-content:center;color:#2E2A26;font:800 19px 'Hanken Grotesk'">Upload More</div>
+        <div style="text-align:center;font:500 15px 'Hanken Grotesk';color:#A79C8E;margin-top:6px">Add dates, names, and stories anytime — no rush.</div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;justify-content:center;padding:14px 0 11px"><div style="width:134px;height:5px;border-radius:3px;background:#2E2A26;opacity:.22"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LIBRARY ============ -->
+<div style="position:absolute;left:2510px;top:0;width:412px">
+  <div data-drags-parent="1" style="font:700 13px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#9a8f80;margin:0 0 16px 8px">Photo Library</div>
+  <div style="width:412px;height:862px;background:#191613;border-radius:56px;padding:11px;box-shadow:0 30px 60px -18px rgba(45,30,15,.4)">
+    <div data-screen-label="Library" style="position:relative;width:390px;height:840px;background:#FAF6F0;border-radius:46px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="flex:0 0 auto;height:52px;display:flex;align-items:center;justify-content:space-between;padding:14px 30px 0;font:700 16px 'Hanken Grotesk';color:#2E2A26">
+        <span>9:41</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:flex;gap:2.5px;align-items:flex-end;height:11px">
+            <div style="width:3px;height:5px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:7px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:9px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:11px;background:#2E2A26;border-radius:1px"></div>
+          </div>
+          <div style="width:25px;height:12px;border:1.6px solid #2E2A26;border-radius:3.5px;padding:1.6px"><div style="width:68%;height:100%;background:#2E2A26;border-radius:1.5px"></div></div>
+        </div>
+      </div>
+      <div style="flex:0 0 auto;padding:4px 20px 0">
+        <div style="display:flex;align-items:baseline;justify-content:space-between">
+          <h1 style="margin:0;font:800 27px 'Hanken Grotesk';letter-spacing:-.01em;color:#2E2A26">Jeff Rice</h1>
+          <span style="font:600 15px 'Hanken Grotesk';color:#A79C8E">1,204 photos</span>
+        </div>
+        <div style="margin-top:14px;height:52px;border-radius:16px;background:#fff;border:1.5px solid #EBE1D2;display:flex;align-items:center;gap:10px;padding:0 16px;font:500 17px 'Hanken Grotesk';color:#A79C8E">🔍 Search photos &amp; people</div>
+        <div style="margin-top:12px;background:linear-gradient(135deg,#7A8B6F,#6C7C62);border-radius:18px;padding:15px 16px;display:flex;align-items:center;gap:13px;box-shadow:0 12px 24px -8px rgba(108,124,98,.5)">
+          <div style="width:46px;height:46px;border-radius:14px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:23px">🔍</div>
+          <div style="flex:1">
+            <div style="font:800 17px 'Hanken Grotesk';color:#fff">Photo Detective</div>
+            <div style="font:500 14px 'Hanken Grotesk';color:rgba(255,255,255,.85)">42 photos need your help</div>
+          </div>
+          <div style="font:800 15px 'Hanken Grotesk';color:#fff;background:rgba(255,255,255,.2);padding:9px 15px;border-radius:12px">Start</div>
+        </div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;gap:9px;padding:15px 20px 13px;overflow:hidden">
+        <div style="flex:0 0 auto;height:40px;padding:0 18px;border-radius:13px;background:#C4704F;color:#fff;display:flex;align-items:center;font:700 15px 'Hanken Grotesk'">All</div>
+        <div style="flex:0 0 auto;height:40px;padding:0 18px;border-radius:13px;background:#fff;border:1.5px solid #EBE1D2;color:#6B635B;display:flex;align-items:center;font:700 15px 'Hanken Grotesk'">Needs info</div>
+        <div style="flex:0 0 auto;height:40px;padding:0 16px;border-radius:13px;background:#fff;border:1.5px solid #EBE1D2;color:#6B635B;display:flex;align-items:center;gap:5px;font:700 15px 'Hanken Grotesk'">🏷️ Tags</div>
+        <div style="flex:0 0 auto;height:40px;padding:0 18px;border-radius:13px;background:#fff;border:1.5px solid #EBE1D2;color:#6B635B;display:flex;align-items:center;font:700 15px 'Hanken Grotesk'">People</div>
+        <div style="flex:0 0 auto;height:40px;padding:0 18px;border-radius:13px;background:#fff;border:1.5px solid #EBE1D2;color:#6B635B;display:flex;align-items:center;font:700 15px 'Hanken Grotesk'">Has date</div>
+      </div>
+      <div style="flex:1;overflow:hidden;padding:0 20px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div style="position:relative;height:172px;border-radius:16px;overflow:hidden;background:#9FA487">
+            <div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div>
+            <div style="position:absolute;top:9px;right:9px;width:28px;height:28px;border-radius:50%;background:rgba(25,20,15,.4);display:flex;align-items:center;justify-content:center;font-size:14px">❤️</div>
+          </div>
+          <div style="position:relative;height:172px;border-radius:16px;overflow:hidden;background:#C9A28B">
+            <div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div>
+            <div style="position:absolute;left:9px;bottom:9px;height:26px;padding:0 9px;border-radius:9px;background:rgba(25,20,15,.55);display:flex;align-items:center;gap:4px;color:#fff;font:700 12px 'Hanken Grotesk'">📅 Add date</div>
+          </div>
+          <div style="position:relative;height:172px;border-radius:16px;overflow:hidden;background:#94A3AC">
+            <div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div>
+          </div>
+          <div style="position:relative;height:172px;border-radius:16px;overflow:hidden;background:#C2B193">
+            <div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div>
+            <div style="position:absolute;left:9px;bottom:9px;height:26px;padding:0 9px;border-radius:9px;background:rgba(25,20,15,.55);display:flex;align-items:center;gap:4px;color:#fff;font:700 12px 'Hanken Grotesk'">📝 Needs story</div>
+          </div>
+          <div style="position:relative;height:172px;border-radius:16px;overflow:hidden;background:#B59BA0">
+            <div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div>
+            <div style="position:absolute;left:9px;bottom:9px;height:26px;padding:0 9px;border-radius:9px;background:rgba(25,20,15,.55);display:flex;align-items:center;gap:4px;color:#fff;font:700 12px 'Hanken Grotesk'">👤 Who's this?</div>
+          </div>
+          <div style="position:relative;height:172px;border-radius:16px;overflow:hidden;background:#A8B69C">
+            <div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div>
+          </div>
+        </div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;border-top:1px solid #EEE5D7;background:#FFFDFA;padding:8px 0 2px">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0;color:#A79C8E">
+          <span style="font-size:24px">📷</span>
+          <span style="font:700 12px 'Hanken Grotesk'">Upload</span>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 0;color:#C4704F">
+          <span style="font-size:24px">🖼️</span>
+          <span style="font:700 12px 'Hanken Grotesk'">Library</span>
+        </div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;justify-content:center;padding:4px 0 10px"><div style="width:134px;height:5px;border-radius:3px;background:#2E2A26;opacity:.22"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PHOTO DETAIL ============ -->
+<div style="position:absolute;left:3012px;top:0;width:412px">
+  <div data-drags-parent="1" style="font:700 13px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#9a8f80;margin:0 0 16px 8px">Photo Detail · collaborative</div>
+  <div style="width:412px;height:862px;background:#191613;border-radius:56px;padding:11px;box-shadow:0 30px 60px -18px rgba(45,30,15,.4)">
+    <div data-screen-label="Photo detail" style="position:relative;width:390px;height:840px;background:#FAF6F0;border-radius:46px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="flex:0 0 auto;height:52px;display:flex;align-items:center;justify-content:space-between;padding:14px 30px 0;font:700 16px 'Hanken Grotesk';color:#2E2A26">
+        <span>9:41</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:flex;gap:2.5px;align-items:flex-end;height:11px">
+            <div style="width:3px;height:5px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:7px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:9px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:11px;background:#2E2A26;border-radius:1px"></div>
+          </div>
+          <div style="width:25px;height:12px;border:1.6px solid #2E2A26;border-radius:3.5px;padding:1.6px"><div style="width:68%;height:100%;background:#2E2A26;border-radius:1.5px"></div></div>
+        </div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:4px 20px 10px">
+        <div style="width:44px;height:44px;border-radius:14px;background:#fff;border:1.5px solid #EBE1D2;display:flex;align-items:center;justify-content:center;font:400 26px/1 'Hanken Grotesk';color:#2E2A26;padding-bottom:4px">‹</div>
+        <span style="font:800 19px 'Hanken Grotesk';color:#2E2A26">Photo</span>
+        <div style="width:44px;height:44px;border-radius:14px;background:#fff;border:1.5px solid #EBE1D2;display:flex;align-items:center;justify-content:center;font-size:20px">❤️</div>
+      </div>
+      <div style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+        <div style="flex:0 0 auto;margin:0 20px;height:248px;border-radius:22px;overflow:hidden;background:#C2B193;position:relative">
+          <div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.18))"></div>
+        </div>
+        <div style="flex:1;overflow:hidden;padding:14px 20px 0;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;gap:7px;font:600 14px 'Hanken Grotesk';color:#7A8B6F"><span style="color:#7A8B6F">✓</span> Changes save automatically as your family adds them</div>
+          <div style="background:#FBF1EC;border:1.5px solid #EAC9B8;border-radius:20px;padding:17px 18px;box-shadow:0 6px 16px rgba(196,112,79,.08)">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+              <span style="font:700 13px 'Hanken Grotesk';letter-spacing:.06em;text-transform:uppercase;color:#C4704F">📅 When was this taken?</span>
+              <span style="font:700 15px 'Hanken Grotesk';color:#C4704F">Edit</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font:800 24px 'Hanken Grotesk';color:#2E2A26">Around 1962</span>
+              <span style="font:700 13px 'Hanken Grotesk';color:#7A8B6F;background:#EEF1E9;padding:5px 11px;border-radius:9px">Approximate</span>
+            </div>
+            <div style="margin-top:10px;font:600 13px 'Hanken Grotesk';color:#C4704F">⭐ The most helpful thing to add</div>
+          </div>
+          <div style="background:#fff;border:1.5px solid #EFE6D8;border-radius:20px;padding:17px 18px;box-shadow:0 6px 16px rgba(60,45,30,.04)">
+            <div style="font:700 13px 'Hanken Grotesk';letter-spacing:.06em;text-transform:uppercase;color:#A79C8E;margin-bottom:12px">👤 Who's in this photo?</div>
+            <div style="display:flex;flex-wrap:wrap;gap:9px">
+              <div style="height:42px;padding:0 14px 0 7px;border-radius:13px;background:#F0EAE0;display:flex;align-items:center;gap:9px;font:700 16px 'Hanken Grotesk';color:#2E2A26"><span style="width:28px;height:28px;border-radius:50%;background:#C4704F;color:#fff;display:flex;align-items:center;justify-content:center;font:800 11px 'Hanken Grotesk'">GJ</span>Grandma Jean <span style="color:#B7AC9D;font-size:18px">×</span></div>
+              <div style="height:42px;padding:0 14px 0 7px;border-radius:13px;background:#F0EAE0;display:flex;align-items:center;gap:9px;font:700 16px 'Hanken Grotesk';color:#2E2A26"><span style="width:28px;height:28px;border-radius:50%;background:#7A8B6F;color:#fff;display:flex;align-items:center;justify-content:center;font:800 11px 'Hanken Grotesk'">UM</span>Uncle Mike <span style="color:#B7AC9D;font-size:18px">×</span></div>
+              <div style="height:42px;padding:0 16px;border-radius:13px;border:1.6px dashed #D9CAB3;display:flex;align-items:center;gap:6px;font:700 16px 'Hanken Grotesk';color:#A79C8E">＋ Add person</div>
+            </div>
+          </div>
+          <div style="background:#FBF7F0;border:1.6px dashed #D9CAB3;border-radius:20px;padding:17px 18px;display:flex;align-items:center;gap:13px">
+            <span style="font-size:26px">📍</span>
+            <div>
+              <div style="font:800 18px 'Hanken Grotesk';color:#2E2A26">Add a location</div>
+              <div style="font:500 15px 'Hanken Grotesk';color:#A79C8E">Do you know where this was taken?</div>
+            </div>
+          </div>
+          <div style="background:#fff;border:1.5px solid #EFE6D8;border-radius:20px;padding:17px 18px;box-shadow:0 6px 16px rgba(60,45,30,.04)">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+              <span style="font:700 13px 'Hanken Grotesk';letter-spacing:.06em;text-transform:uppercase;color:#A79C8E">✍️ About this photo</span>
+              <span style="font:700 15px 'Hanken Grotesk';color:#C4704F">Edit</span>
+            </div>
+            <p style="margin:0;font:500 17px/1.55 'Hanken Grotesk';color:#3D3833">Summer at the lake. The morning Mike caught his first fish — he wouldn't put the rod down for hours.</p>
+          </div>
+          <div style="background:#fff;border:1.5px solid #EFE6D8;border-radius:20px;padding:17px 18px;box-shadow:0 6px 16px rgba(60,45,30,.04)">
+            <div style="font:700 13px 'Hanken Grotesk';letter-spacing:.06em;text-transform:uppercase;color:#A79C8E;margin-bottom:12px">🏷️ Tags</div>
+            <div style="display:flex;flex-wrap:wrap;gap:9px">
+              <div style="height:38px;padding:0 14px;border-radius:11px;background:#F0EAE0;display:flex;align-items:center;font:700 15px 'Hanken Grotesk';color:#2E2A26">Lake house</div>
+              <div style="height:38px;padding:0 14px;border-radius:11px;background:#F0EAE0;display:flex;align-items:center;font:700 15px 'Hanken Grotesk';color:#2E2A26">Summer</div>
+              <div style="height:38px;padding:0 14px;border-radius:11px;background:#F0EAE0;display:flex;align-items:center;font:700 15px 'Hanken Grotesk';color:#2E2A26">Fishing</div>
+              <div style="height:38px;padding:0 14px;border-radius:11px;border:1.6px dashed #D9CAB3;display:flex;align-items:center;font:700 15px 'Hanken Grotesk';color:#A79C8E">＋ Add tag</div>
+            </div>
+          </div>
+          <div style="background:#fff;border:1.5px solid #EFE6D8;border-radius:20px;padding:17px 18px;box-shadow:0 6px 16px rgba(60,45,30,.04)">
+            <div style="font:700 13px 'Hanken Grotesk';letter-spacing:.06em;text-transform:uppercase;color:#A79C8E;margin-bottom:14px">Contributors · who's helped</div>
+            <div style="display:flex;flex-direction:column;gap:13px">
+              <div style="display:flex;align-items:center;gap:11px">
+                <span style="width:30px;height:30px;border-radius:50%;background:#C4704F;color:#fff;display:flex;align-items:center;justify-content:center;font:800 12px 'Hanken Grotesk'">S</span>
+                <div style="flex:1;font:500 15px 'Hanken Grotesk';color:#7A7066"><span style="font-weight:700;color:#2E2A26">Sarah</span> uploaded this photo</div>
+                <span style="font:600 13px 'Hanken Grotesk';color:#B7AC9D">Mar 2</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:11px">
+                <span style="width:30px;height:30px;border-radius:50%;background:#7A8B6F;color:#fff;display:flex;align-items:center;justify-content:center;font:800 12px 'Hanken Grotesk'">GJ</span>
+                <div style="flex:1;font:500 15px 'Hanken Grotesk';color:#7A7066"><span style="font-weight:700;color:#2E2A26">Grandma Jean</span> added the date</div>
+                <span style="font:600 13px 'Hanken Grotesk';color:#B7AC9D">Mar 4</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:11px">
+                <span style="width:30px;height:30px;border-radius:50%;background:#B08A6B;color:#fff;display:flex;align-items:center;justify-content:center;font:800 12px 'Hanken Grotesk'">UM</span>
+                <div style="flex:1;font:500 15px 'Hanken Grotesk';color:#7A7066"><span style="font-weight:700;color:#2E2A26">Uncle Mike</span> wrote the story</div>
+                <span style="font:600 13px 'Hanken Grotesk';color:#B7AC9D">Mar 6</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;justify-content:center;padding:6px 0 11px"><div style="width:134px;height:5px;border-radius:3px;background:#2E2A26;opacity:.22"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PHOTO DETECTIVE ============ -->
+<div style="position:absolute;left:3514px;top:0;width:412px">
+  <div data-drags-parent="1" style="font:700 13px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#9a8f80;margin:0 0 16px 8px">Photo Detective mode</div>
+  <div style="width:412px;height:862px;background:#191613;border-radius:56px;padding:11px;box-shadow:0 30px 60px -18px rgba(45,30,15,.4)">
+    <div data-screen-label="Photo Detective" style="position:relative;width:390px;height:840px;background:#FAF6F0;border-radius:46px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="flex:0 0 auto;height:52px;display:flex;align-items:center;justify-content:space-between;padding:14px 30px 0;font:700 16px 'Hanken Grotesk';color:#2E2A26">
+        <span>9:41</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:flex;gap:2.5px;align-items:flex-end;height:11px">
+            <div style="width:3px;height:5px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:7px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:9px;background:#2E2A26;border-radius:1px"></div>
+            <div style="width:3px;height:11px;background:#2E2A26;border-radius:1px"></div>
+          </div>
+          <div style="width:25px;height:12px;border:1.6px solid #2E2A26;border-radius:3.5px;padding:1.6px"><div style="width:68%;height:100%;background:#2E2A26;border-radius:1.5px"></div></div>
+        </div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:4px 20px 10px">
+        <div style="width:44px;height:44px;border-radius:14px;background:#fff;border:1.5px solid #EBE1D2;display:flex;align-items:center;justify-content:center;font:400 22px/1 'Hanken Grotesk';color:#6B635B">✕</div>
+        <span style="font:800 18px 'Hanken Grotesk';color:#2E2A26">🔍 Photo Detective</span>
+        <span style="font:700 15px 'Hanken Grotesk';color:#A79C8E;width:44px;text-align:right">3 / 42</span>
+      </div>
+      <div style="flex:0 0 auto;margin:0 20px;height:8px;border-radius:5px;background:#EFE7DA;overflow:hidden"><div style="width:7%;height:100%;background:#7A8B6F;border-radius:5px"></div></div>
+      <div style="flex:1;display:flex;flex-direction:column;padding:18px 20px 0;overflow:hidden">
+        <div style="flex:0 0 auto;height:286px;border-radius:22px;overflow:hidden;background:#94A3AC;position:relative">
+          <div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.18))"></div>
+        </div>
+        <h2 style="margin:22px 0 5px;font:800 23px 'Hanken Grotesk';color:#2E2A26;text-align:center;letter-spacing:-.01em">Do you know when this was taken?</h2>
+        <p style="margin:0;text-align:center;font:500 16px 'Hanken Grotesk';color:#A79C8E">Pick a decade, or skip to the next one.</p>
+        <div style="margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:11px">
+          <div style="height:58px;border-radius:16px;background:#fff;border:1.5px solid #E3D8C8;display:flex;align-items:center;justify-content:center;font:800 18px 'Hanken Grotesk';color:#2E2A26">1950s</div>
+          <div style="height:58px;border-radius:16px;background:#fff;border:1.5px solid #E3D8C8;display:flex;align-items:center;justify-content:center;font:800 18px 'Hanken Grotesk';color:#2E2A26">1960s</div>
+          <div style="height:58px;border-radius:16px;background:#fff;border:1.5px solid #E3D8C8;display:flex;align-items:center;justify-content:center;font:800 18px 'Hanken Grotesk';color:#2E2A26">1970s</div>
+          <div style="height:58px;border-radius:16px;background:#fff;border:1.5px solid #E3D8C8;display:flex;align-items:center;justify-content:center;font:800 18px 'Hanken Grotesk';color:#A79C8E">Not sure</div>
+        </div>
+      </div>
+      <div style="flex:0 0 auto;padding:14px 20px 8px">
+        <div style="text-align:center;font:700 15px 'Hanken Grotesk';color:#6C7C62;background:#EEF1E9;border-radius:14px;padding:13px">🎉 Nice work — you've helped with 7 photos today</div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;justify-content:center;padding:6px 0 11px"><div style="width:134px;height:5px;border-radius:3px;background:#2E2A26;opacity:.22"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DESKTOP NOTE ============ -->
+<div style="position:absolute;left:0;top:1010px;width:1340px">
+  <div data-drags-parent="1" style="font:700 13px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#9a8f80;margin:0 0 16px 8px">Desktop — the library becomes a workspace</div>
+  <div data-screen-label="Desktop Library" style="width:1340px;height:858px;background:#FAF6F0;border:1px solid #E7DDCE;border-radius:18px;overflow:hidden;box-shadow:0 26px 60px -20px rgba(45,30,15,.3);display:flex;flex-direction:column">
+    <div style="flex:0 0 auto;height:68px;display:flex;align-items:center;gap:22px;padding:0 26px;border-bottom:1px solid #EEE5D7;background:#FFFDFA">
+      <div style="display:flex;align-items:center;gap:11px">
+        <div style="width:34px;height:34px;border-radius:10px;background:#C4704F;display:flex;align-items:center;justify-content:center;font-size:18px">🌿</div>
+        <span style="font:800 18px 'Hanken Grotesk';color:#2E2A26">Memories</span>
+        <span style="font:600 16px 'Hanken Grotesk';color:#C4B9A8">›</span>
+        <span style="font:700 16px 'Hanken Grotesk';color:#7A7066">Jeff Rice</span>
+      </div>
+      <div style="flex:1;max-width:460px;margin:0 auto;height:44px;border-radius:13px;background:#F4EEE4;border:1.5px solid #EBE1D2;display:flex;align-items:center;gap:10px;padding:0 16px;font:500 16px 'Hanken Grotesk';color:#A79C8E">🔍 Search photos &amp; people</div>
+      <div style="display:flex;gap:11px">
+        <div style="height:44px;padding:0 18px;border-radius:13px;background:#fff;border:1.5px solid #E3D8C8;display:flex;align-items:center;font:700 15px 'Hanken Grotesk';color:#2E2A26">Select</div>
+        <div style="height:44px;padding:0 18px;border-radius:13px;background:#C4704F;display:flex;align-items:center;gap:8px;font:700 15px 'Hanken Grotesk';color:#fff">📷 Upload</div>
+      </div>
+    </div>
+    <div style="flex:1;display:flex;overflow:hidden">
+      <div style="flex:0 0 230px;border-right:1px solid #EEE5D7;background:#FBF7F0;padding:22px 16px;display:flex;flex-direction:column;gap:4px">
+        <div style="font:700 12px 'Hanken Grotesk';letter-spacing:.1em;text-transform:uppercase;color:#A79C8E;padding:0 12px 8px">Filters</div>
+        <div style="height:44px;border-radius:12px;background:#C4704F;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:700 15px 'Hanken Grotesk'">All photos <span style="opacity:.85">1,204</span></div>
+        <div style="height:44px;border-radius:12px;color:#6B635B;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:600 15px 'Hanken Grotesk'">Needs info <span style="color:#C4704F;font-weight:700">312</span></div>
+        <div style="height:44px;border-radius:12px;color:#6B635B;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:600 15px 'Hanken Grotesk'">Has people <span style="color:#B7AC9D">540</span></div>
+        <div style="height:44px;border-radius:12px;color:#6B635B;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:600 15px 'Hanken Grotesk'">Has story <span style="color:#B7AC9D">287</span></div>
+        <div style="height:44px;border-radius:12px;color:#6B635B;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font:600 15px 'Hanken Grotesk'">Recently added <span style="color:#B7AC9D">96</span></div>
+        <div style="height:1px;background:#EBE1D2;margin:10px 12px"></div>
+        <div style="font:700 12px 'Hanken Grotesk';letter-spacing:.1em;text-transform:uppercase;color:#A79C8E;padding:0 12px 8px">Decade</div>
+        <div style="height:40px;border-radius:12px;color:#6B635B;display:flex;align-items:center;padding:0 14px;font:600 15px 'Hanken Grotesk'">1950s · 1960s · 1970s</div>
+        <div style="margin-top:auto;background:linear-gradient(135deg,#7A8B6F,#6C7C62);border-radius:14px;padding:14px;color:#fff">
+          <div style="font:800 15px 'Hanken Grotesk'">🔍 Photo Detective</div>
+          <div style="font:500 13px 'Hanken Grotesk';color:rgba(255,255,255,.85);margin-top:2px">42 photos need help</div>
+        </div>
+      </div>
+      <div style="flex:1;overflow:hidden;padding:22px 24px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px">
+          <h1 style="margin:0;font:800 24px 'Hanken Grotesk';color:#2E2A26">All photos</h1>
+          <span style="font:700 15px 'Hanken Grotesk';color:#C4704F;background:#F6E9E2;padding:7px 14px;border-radius:11px">3 selected · Edit together</span>
+        </div>
+        <div style="column-count:3;column-gap:16px">
+          <div style="break-inside:avoid;margin-bottom:16px;height:200px;border-radius:14px;background:#9FA487;position:relative;overflow:hidden"><div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div></div>
+          <div style="break-inside:avoid;margin-bottom:16px;height:150px;border-radius:14px;background:#C9A28B;position:relative;overflow:hidden;outline:3px solid #C4704F;outline-offset:2px"><div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div><div style="position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;background:#C4704F;color:#fff;display:flex;align-items:center;justify-content:center;font:800 14px 'Hanken Grotesk'">✓</div></div>
+          <div style="break-inside:avoid;margin-bottom:16px;height:180px;border-radius:14px;background:#94A3AC;position:relative;overflow:hidden"><div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div><div style="position:absolute;left:8px;bottom:8px;height:24px;padding:0 8px;border-radius:8px;background:rgba(25,20,15,.55);display:flex;align-items:center;gap:4px;color:#fff;font:700 11px 'Hanken Grotesk'">📅 Add date</div></div>
+          <div style="break-inside:avoid;margin-bottom:16px;height:160px;border-radius:14px;background:#C2B193;position:relative;overflow:hidden;outline:3px solid #C4704F;outline-offset:2px"><div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div><div style="position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;background:#C4704F;color:#fff;display:flex;align-items:center;justify-content:center;font:800 14px 'Hanken Grotesk'">✓</div></div>
+          <div style="break-inside:avoid;margin-bottom:16px;height:210px;border-radius:14px;background:#B59BA0;position:relative;overflow:hidden"><div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div><div style="position:absolute;left:8px;bottom:8px;height:24px;padding:0 8px;border-radius:8px;background:rgba(25,20,15,.55);display:flex;align-items:center;gap:4px;color:#fff;font:700 11px 'Hanken Grotesk'">👤 Who's this?</div></div>
+          <div style="break-inside:avoid;margin-bottom:16px;height:150px;border-radius:14px;background:#A8B69C;position:relative;overflow:hidden;outline:3px solid #C4704F;outline-offset:2px"><div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div><div style="position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;background:#C4704F;color:#fff;display:flex;align-items:center;justify-content:center;font:800 14px 'Hanken Grotesk'">✓</div></div>
+          <div style="break-inside:avoid;margin-bottom:16px;height:190px;border-radius:14px;background:#BFA67E;position:relative;overflow:hidden"><div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div></div>
+          <div style="break-inside:avoid;margin-bottom:16px;height:160px;border-radius:14px;background:#8E9A93;position:relative;overflow:hidden"><div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div><div style="position:absolute;left:8px;bottom:8px;height:24px;padding:0 8px;border-radius:8px;background:rgba(25,20,15,.55);display:flex;align-items:center;gap:4px;color:#fff;font:700 11px 'Hanken Grotesk'">📝 Needs story</div></div>
+          <div style="break-inside:avoid;margin-bottom:16px;height:180px;border-radius:14px;background:#A89A82;position:relative;overflow:hidden"><div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.16))"></div></div>
+        </div>
+      </div>
+      <div style="flex:0 0 330px;border-left:1px solid #EEE5D7;background:#FFFDFA;padding:22px;display:flex;flex-direction:column;gap:14px;overflow:hidden">
+        <div style="font:700 12px 'Hanken Grotesk';letter-spacing:.1em;text-transform:uppercase;color:#A79C8E">Editing 3 photos together</div>
+        <div style="display:flex;gap:8px">
+          <div style="width:58px;height:58px;border-radius:11px;background:#C9A28B"></div>
+          <div style="width:58px;height:58px;border-radius:11px;background:#C2B193"></div>
+          <div style="width:58px;height:58px;border-radius:11px;background:#A8B69C"></div>
+        </div>
+        <div style="background:#fff;border:1.5px solid #EFE6D8;border-radius:16px;padding:15px">
+          <div style="font:700 12px 'Hanken Grotesk';letter-spacing:.06em;text-transform:uppercase;color:#A79C8E;margin-bottom:8px">📅 Date for all three</div>
+          <div style="display:flex;align-items:center;gap:9px">
+            <span style="font:800 20px 'Hanken Grotesk';color:#2E2A26">Summer 1962</span>
+            <span style="font:700 12px 'Hanken Grotesk';color:#7A8B6F;background:#EEF1E9;padding:4px 9px;border-radius:8px">Approximate</span>
+          </div>
+        </div>
+        <div style="background:#fff;border:1.5px solid #EFE6D8;border-radius:16px;padding:15px">
+          <div style="font:700 12px 'Hanken Grotesk';letter-spacing:.06em;text-transform:uppercase;color:#A79C8E;margin-bottom:10px">👤 People</div>
+          <div style="display:flex;flex-wrap:wrap;gap:7px">
+            <div style="height:36px;padding:0 12px 0 6px;border-radius:11px;background:#F0EAE0;display:flex;align-items:center;gap:7px;font:700 14px 'Hanken Grotesk';color:#2E2A26"><span style="width:24px;height:24px;border-radius:50%;background:#C4704F;color:#fff;display:flex;align-items:center;justify-content:center;font:800 10px 'Hanken Grotesk'">GJ</span>Grandma Jean</div>
+            <div style="height:36px;padding:0 14px;border-radius:11px;border:1.5px dashed #D9CAB3;display:flex;align-items:center;font:700 14px 'Hanken Grotesk';color:#A79C8E">＋ Add</div>
+          </div>
+        </div>
+        <div style="background:#fff;border:1.5px solid #EFE6D8;border-radius:16px;padding:15px">
+          <div style="font:700 12px 'Hanken Grotesk';letter-spacing:.06em;text-transform:uppercase;color:#A79C8E;margin-bottom:8px">📍 Location</div>
+          <span style="font:600 16px 'Hanken Grotesk';color:#2E2A26">Lake Tahoe, California</span>
+        </div>
+        <div style="margin-top:auto;height:50px;border-radius:14px;background:#C4704F;display:flex;align-items:center;justify-content:center;color:#fff;font:800 16px 'Hanken Grotesk'">Apply to all 3 photos</div>
+        <div style="text-align:center;font:600 13px 'Hanken Grotesk';color:#A79C8E">✓ Saved automatically</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PHOTO VIEW — FULL CONTENTS ============ -->
+<div style="position:absolute;left:0;top:2000px;width:412px">
+  <div data-drags-parent="1" style="font:700 13px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#9a8f80;margin:0 0 16px 8px">Photo view · full contents (scrolled)</div>
+  <div data-screen-label="Photo view full" style="width:390px;background:#FAF6F0;border-radius:40px;overflow:hidden;box-shadow:0 30px 60px -18px rgba(45,30,15,.4);border:1px solid #E7DDCE;display:flex;flex-direction:column">
+    <div style="flex:0 0 auto;height:52px;display:flex;align-items:center;justify-content:space-between;padding:14px 30px 0;font:700 16px 'Hanken Grotesk';color:#2E2A26">
+      <span>9:41</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="display:flex;gap:2.5px;align-items:flex-end;height:11px">
+          <div style="width:3px;height:5px;background:#2E2A26;border-radius:1px"></div>
+          <div style="width:3px;height:7px;background:#2E2A26;border-radius:1px"></div>
+          <div style="width:3px;height:9px;background:#2E2A26;border-radius:1px"></div>
+          <div style="width:3px;height:11px;background:#2E2A26;border-radius:1px"></div>
+        </div>
+        <div style="width:25px;height:12px;border:1.6px solid #2E2A26;border-radius:3.5px;padding:1.6px"><div style="width:68%;height:100%;background:#2E2A26;border-radius:1.5px"></div></div>
+      </div>
+    </div>
+    <div style="flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:4px 20px 10px">
+      <div style="width:44px;height:44px;border-radius:14px;background:#fff;border:1.5px solid #EBE1D2;display:flex;align-items:center;justify-content:center;font:400 26px/1 'Hanken Grotesk';color:#2E2A26;padding-bottom:4px">‹</div>
+      <span style="font:800 19px 'Hanken Grotesk';color:#2E2A26">Photo</span>
+      <div style="width:44px;height:44px;border-radius:14px;background:#fff;border:1.5px solid #EBE1D2;display:flex;align-items:center;justify-content:center;font:800 22px/1 'Hanken Grotesk';color:#6B635B;padding-bottom:8px">⋯</div>
+    </div>
+    <div style="padding:0 20px 24px;display:flex;flex-direction:column;gap:12px">
+      <div style="height:300px;border-radius:22px;overflow:hidden;background:#C2B193;position:relative">
+        <div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.18))"></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <div style="flex:1;height:50px;border-radius:14px;background:#fff;border:1.5px solid #EBE1D2;display:flex;align-items:center;justify-content:center;gap:7px;font:700 15px 'Hanken Grotesk';color:#C4704F">❤️ Favorite</div>
+        <div style="flex:1;height:50px;border-radius:14px;background:#fff;border:1.5px solid #EBE1D2;display:flex;align-items:center;justify-content:center;gap:7px;font:700 15px 'Hanken Grotesk';color:#2E2A26">⤴ Share</div>
+        <div style="flex:1;height:50px;border-radius:14px;background:#fff;border:1.5px solid #EBE1D2;display:flex;align-items:center;justify-content:center;gap:7px;font:700 15px 'Hanken Grotesk';color:#2E2A26">⊞ Album</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;font:600 14px 'Hanken Grotesk';color:#7A8B6F;padding:2px 0"><span>✓</span> Everything here saves automatically as your family adds it</div>
+      <div style="background:#FBF1EC;border:1.5px solid #EAC9B8;border-radius:20px;padding:17px 18px;box-shadow:0 6px 16px rgba(196,112,79,.08)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+          <span style="font:700 13px 'Hanken Grotesk';letter-spacing:.06em;text-transform:uppercase;color:#C4704F">📅 When was this taken?</span>
+          <span style="font:700 15px 'Hanken Grotesk';color:#C4704F">Edit</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font:800 24px 'Hanken Grotesk';color:#2E2A26">Around 1962</span>
+          <span style="font:700 13px 'Hanken Grotesk';color:#7A8B6F;background:#EEF1E9;padding:5px 11px;border-radius:9px">Approximate</span>
+        </div>
+        <div style="margin-top:10px;font:600 13px 'Hanken Grotesk';color:#C4704F">⭐ The most helpful thing to add</div>
+      </div>
+      <div style="background:#fff;border:1.5px solid #EFE6D8;border-radius:20px;padding:17px 18px;box-shadow:0 6px 16px rgba(60,45,30,.04)">
+        <div style="font:700 13px 'Hanken Grotesk';letter-spacing:.06em;text-transform:uppercase;color:#A79C8E;margin-bottom:12px">👤 Who's in this photo?</div>
+        <div style="display:flex;flex-wrap:wrap;gap:9px">
+          <div style="height:42px;padding:0 14px 0 7px;border-radius:13px;background:#F0EAE0;display:flex;align-items:center;gap:9px;font:700 16px 'Hanken Grotesk';color:#2E2A26"><span style="width:28px;height:28px;border-radius:50%;background:#C4704F;color:#fff;display:flex;align-items:center;justify-content:center;font:800 11px 'Hanken Grotesk'">GJ</span>Grandma Jean <span style="color:#B7AC9D;font-size:18px">×</span></div>
+          <div style="height:42px;padding:0 14px 0 7px;border-radius:13px;background:#F0EAE0;display:flex;align-items:center;gap:9px;font:700 16px 'Hanken Grotesk';color:#2E2A26"><span style="width:28px;height:28px;border-radius:50%;background:#7A8B6F;color:#fff;display:flex;align-items:center;justify-content:center;font:800 11px 'Hanken Grotesk'">UM</span>Uncle Mike <span style="color:#B7AC9D;font-size:18px">×</span></div>
+          <div style="height:42px;padding:0 16px;border-radius:13px;border:1.6px dashed #D9CAB3;display:flex;align-items:center;gap:6px;font:700 16px 'Hanken Grotesk';color:#A79C8E">＋ Add person</div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1.5px solid #EFE6D8;border-radius:20px;padding:17px 18px;box-shadow:0 6px 16px rgba(60,45,30,.04)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+          <span style="font:700 13px 'Hanken Grotesk';letter-spacing:.06em;text-transform:uppercase;color:#A79C8E">📍 Where was this?</span>
+          <span style="font:700 15px 'Hanken Grotesk';color:#C4704F">Edit</span>
+        </div>
+        <span style="font:700 20px 'Hanken Grotesk';color:#2E2A26">Lake Tahoe, California</span>
+      </div>
+      <div style="background:#fff;border:1.5px solid #EFE6D8;border-radius:20px;padding:17px 18px;box-shadow:0 6px 16px rgba(60,45,30,.04)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+          <span style="font:700 13px 'Hanken Grotesk';letter-spacing:.06em;text-transform:uppercase;color:#A79C8E">✍️ About this photo</span>
+          <span style="font:700 15px 'Hanken Grotesk';color:#C4704F">Edit</span>
+        </div>
+        <p style="margin:0;font:500 17px/1.55 'Hanken Grotesk';color:#3D3833">Summer at the lake. The morning Mike caught his first fish — he wouldn't put the rod down for hours. Jean packed sandwiches and we stayed until the sun went down.</p>
+      </div>
+      <div style="background:#fff;border:1.5px solid #EFE6D8;border-radius:20px;padding:17px 18px;box-shadow:0 6px 16px rgba(60,45,30,.04)">
+        <div style="font:700 13px 'Hanken Grotesk';letter-spacing:.06em;text-transform:uppercase;color:#A79C8E;margin-bottom:12px">🏷️ Tags</div>
+        <div style="display:flex;flex-wrap:wrap;gap:9px">
+          <div style="height:38px;padding:0 14px;border-radius:11px;background:#F0EAE0;display:flex;align-items:center;font:700 15px 'Hanken Grotesk';color:#2E2A26">Lake house</div>
+          <div style="height:38px;padding:0 14px;border-radius:11px;background:#F0EAE0;display:flex;align-items:center;font:700 15px 'Hanken Grotesk';color:#2E2A26">Summer</div>
+          <div style="height:38px;padding:0 14px;border-radius:11px;background:#F0EAE0;display:flex;align-items:center;font:700 15px 'Hanken Grotesk';color:#2E2A26">Fishing</div>
+          <div style="height:38px;padding:0 14px;border-radius:11px;background:#F0EAE0;display:flex;align-items:center;font:700 15px 'Hanken Grotesk';color:#2E2A26">1960s</div>
+          <div style="height:38px;padding:0 14px;border-radius:11px;border:1.6px dashed #D9CAB3;display:flex;align-items:center;font:700 15px 'Hanken Grotesk';color:#A79C8E">＋ Add tag</div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1.5px solid #EFE6D8;border-radius:20px;padding:17px 18px;box-shadow:0 6px 16px rgba(60,45,30,.04)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px">
+          <span style="font:700 13px 'Hanken Grotesk';letter-spacing:.06em;text-transform:uppercase;color:#A79C8E">🗒️ Notes</span>
+          <span style="font:700 15px 'Hanken Grotesk';color:#C4704F">Edit</span>
+        </div>
+        <p style="margin:0;font:500 16px/1.5 'Hanken Grotesk';color:#5C554D">Scanned from Grandma Jean's album, page 4. The original is a 3×3 print with a white border. There may be a second photo from the same day in the shoebox.</p>
+      </div>
+      <div style="background:#FBF7F0;border:1.5px solid #EFE6D8;border-radius:20px;padding:17px 18px">
+        <div style="font:700 13px 'Hanken Grotesk';letter-spacing:.06em;text-transform:uppercase;color:#A79C8E;margin-bottom:12px">Photo details</div>
+        <div style="display:flex;flex-direction:column;gap:9px;font:500 15px 'Hanken Grotesk';color:#5C554D">
+          <div style="display:flex;justify-content:space-between"><span style="color:#A79C8E">Added</span><span>Mar 2, 2025</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#A79C8E">Source</span><span>Scanned · Sarah's phone</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#A79C8E">File</span><span>JPEG · 2.4 MB · 2048×1536</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="color:#A79C8E">Photo ID</span><span>#JR-0417</span></div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1.5px solid #EFE6D8;border-radius:20px;padding:17px 18px;box-shadow:0 6px 16px rgba(60,45,30,.04)">
+        <div style="font:700 13px 'Hanken Grotesk';letter-spacing:.06em;text-transform:uppercase;color:#A79C8E;margin-bottom:14px">Contributors · who's helped</div>
+        <div style="display:flex;flex-direction:column;gap:13px">
+          <div style="display:flex;align-items:center;gap:11px">
+            <span style="width:30px;height:30px;border-radius:50%;background:#C4704F;color:#fff;display:flex;align-items:center;justify-content:center;font:800 12px 'Hanken Grotesk'">S</span>
+            <div style="flex:1;font:500 15px 'Hanken Grotesk';color:#7A7066"><span style="font-weight:700;color:#2E2A26">Sarah</span> uploaded this photo</div>
+            <span style="font:600 13px 'Hanken Grotesk';color:#B7AC9D">Mar 2</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:11px">
+            <span style="width:30px;height:30px;border-radius:50%;background:#7A8B6F;color:#fff;display:flex;align-items:center;justify-content:center;font:800 12px 'Hanken Grotesk'">GJ</span>
+            <div style="flex:1;font:500 15px 'Hanken Grotesk';color:#7A7066"><span style="font-weight:700;color:#2E2A26">Grandma Jean</span> added the date</div>
+            <span style="font:600 13px 'Hanken Grotesk';color:#B7AC9D">Mar 4</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:11px">
+            <span style="width:30px;height:30px;border-radius:50%;background:#B08A6B;color:#fff;display:flex;align-items:center;justify-content:center;font:800 12px 'Hanken Grotesk'">UM</span>
+            <div style="flex:1;font:500 15px 'Hanken Grotesk';color:#7A7066"><span style="font-weight:700;color:#2E2A26">Uncle Mike</span> wrote the story</div>
+            <span style="font:600 13px 'Hanken Grotesk';color:#B7AC9D">Mar 6</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:11px">
+            <span style="width:30px;height:30px;border-radius:50%;background:#8C7BA0;color:#fff;display:flex;align-items:center;justify-content:center;font:800 12px 'Hanken Grotesk'">B</span>
+            <div style="flex:1;font:500 15px 'Hanken Grotesk';color:#7A7066"><span style="font-weight:700;color:#2E2A26">Bryant</span> tagged the location</div>
+            <span style="font:600 13px 'Hanken Grotesk';color:#B7AC9D">Mar 9</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:7px;font:600 14px 'Hanken Grotesk';color:#A79C8E;padding-top:2px">✓ Saved automatically</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DETECTIVE — MISSION PICKER ============ -->
+<div style="position:absolute;left:502px;top:2000px;width:412px">
+  <div data-drags-parent="1" style="font:700 13px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#9a8f80;margin:0 0 16px 8px">Detective · choose a mission</div>
+  <div style="width:412px;height:862px;background:#191613;border-radius:56px;padding:11px;box-shadow:0 30px 60px -18px rgba(45,30,15,.4)">
+    <div data-screen-label="Detective missions" style="position:relative;width:390px;height:840px;background:#FAF6F0;border-radius:46px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="flex:0 0 auto;height:52px;display:flex;align-items:center;justify-content:space-between;padding:14px 30px 0;font:700 16px 'Hanken Grotesk';color:#2E2A26">
+        <span>9:41</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:flex;gap:2.5px;align-items:flex-end;height:11px"><div style="width:3px;height:5px;background:#2E2A26;border-radius:1px"></div><div style="width:3px;height:7px;background:#2E2A26;border-radius:1px"></div><div style="width:3px;height:9px;background:#2E2A26;border-radius:1px"></div><div style="width:3px;height:11px;background:#2E2A26;border-radius:1px"></div></div>
+          <div style="width:25px;height:12px;border:1.6px solid #2E2A26;border-radius:3.5px;padding:1.6px"><div style="width:68%;height:100%;background:#2E2A26;border-radius:1.5px"></div></div>
+        </div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:4px 20px 8px">
+        <div style="width:44px;height:44px;border-radius:14px;background:#fff;border:1.5px solid #EBE1D2;display:flex;align-items:center;justify-content:center;font:400 22px/1 'Hanken Grotesk';color:#6B635B">✕</div>
+        <span style="font:800 18px 'Hanken Grotesk';color:#2E2A26">🔍 Photo Detective</span>
+        <span style="width:44px"></span>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;padding:10px 22px 0;overflow:hidden">
+        <h1 style="margin:0 0 8px;font:800 28px/1.15 'Hanken Grotesk';letter-spacing:-.01em;color:#2E2A26">Let's solve some mysteries</h1>
+        <p style="margin:0 0 20px;font:500 17px/1.5 'Hanken Grotesk';color:#7A7066">Pick what you'd like to help with. Even a few minutes makes a big difference.</p>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="background:#fff;border:1.5px solid #EBE1D2;border-radius:18px;padding:15px 16px;display:flex;align-items:center;gap:14px;box-shadow:0 6px 16px rgba(60,45,30,.04)">
+            <div style="width:52px;height:52px;border-radius:15px;background:#F6E9E2;display:flex;align-items:center;justify-content:center;font-size:25px">📅</div>
+            <div style="flex:1"><div style="font:800 19px 'Hanken Grotesk';color:#2E2A26">Add dates</div><div style="font:500 14px 'Hanken Grotesk';color:#A79C8E">42 photos need one</div></div>
+            <span style="font:400 26px 'Hanken Grotesk';color:#C4B9A8">›</span>
+          </div>
+          <div style="background:#fff;border:1.5px solid #EBE1D2;border-radius:18px;padding:15px 16px;display:flex;align-items:center;gap:14px;box-shadow:0 6px 16px rgba(60,45,30,.04)">
+            <div style="width:52px;height:52px;border-radius:15px;background:#EEF1E9;display:flex;align-items:center;justify-content:center;font-size:25px">👤</div>
+            <div style="flex:1"><div style="font:800 19px 'Hanken Grotesk';color:#2E2A26">Name people</div><div style="font:500 14px 'Hanken Grotesk';color:#A79C8E">18 photos with unknown faces</div></div>
+            <span style="font:400 26px 'Hanken Grotesk';color:#C4B9A8">›</span>
+          </div>
+          <div style="background:#fff;border:1.5px solid #EBE1D2;border-radius:18px;padding:15px 16px;display:flex;align-items:center;gap:14px;box-shadow:0 6px 16px rgba(60,45,30,.04)">
+            <div style="width:52px;height:52px;border-radius:15px;background:#F1ECE3;display:flex;align-items:center;justify-content:center;font-size:25px">📝</div>
+            <div style="flex:1"><div style="font:800 19px 'Hanken Grotesk';color:#2E2A26">Tell stories</div><div style="font:500 14px 'Hanken Grotesk';color:#A79C8E">27 photos with no memory yet</div></div>
+            <span style="font:400 26px 'Hanken Grotesk';color:#C4B9A8">›</span>
+          </div>
+          <div style="background:#fff;border:1.5px solid #EBE1D2;border-radius:18px;padding:15px 16px;display:flex;align-items:center;gap:14px;box-shadow:0 6px 16px rgba(60,45,30,.04)">
+            <div style="width:52px;height:52px;border-radius:15px;background:#E9EEF1;display:flex;align-items:center;justify-content:center;font-size:25px">📍</div>
+            <div style="flex:1"><div style="font:800 19px 'Hanken Grotesk';color:#2E2A26">Add places</div><div style="font:500 14px 'Hanken Grotesk';color:#A79C8E">9 photos need a location</div></div>
+            <span style="font:400 26px 'Hanken Grotesk';color:#C4B9A8">›</span>
+          </div>
+        </div>
+        <div style="margin-top:14px;height:56px;border-radius:16px;background:#fff;border:1.5px dashed #D9CAB3;display:flex;align-items:center;justify-content:center;gap:9px;font:800 17px 'Hanken Grotesk';color:#7A7066">🎲 Surprise me</div>
+        <div style="margin-top:auto;padding:18px 0 8px;display:flex;align-items:center;justify-content:center;gap:8px;font:700 15px 'Hanken Grotesk';color:#C4704F">🔥 3-day streak · 64 details added</div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;justify-content:center;padding:4px 0 11px"><div style="width:134px;height:5px;border-radius:3px;background:#2E2A26;opacity:.22"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DETECTIVE — PEOPLE ============ -->
+<div style="position:absolute;left:1004px;top:2000px;width:412px">
+  <div data-drags-parent="1" style="font:700 13px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#9a8f80;margin:0 0 16px 8px">Detective · name people</div>
+  <div style="width:412px;height:862px;background:#191613;border-radius:56px;padding:11px;box-shadow:0 30px 60px -18px rgba(45,30,15,.4)">
+    <div data-screen-label="Detective people" style="position:relative;width:390px;height:840px;background:#FAF6F0;border-radius:46px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="flex:0 0 auto;height:52px;display:flex;align-items:center;justify-content:space-between;padding:14px 30px 0;font:700 16px 'Hanken Grotesk';color:#2E2A26">
+        <span>9:41</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:flex;gap:2.5px;align-items:flex-end;height:11px"><div style="width:3px;height:5px;background:#2E2A26;border-radius:1px"></div><div style="width:3px;height:7px;background:#2E2A26;border-radius:1px"></div><div style="width:3px;height:9px;background:#2E2A26;border-radius:1px"></div><div style="width:3px;height:11px;background:#2E2A26;border-radius:1px"></div></div>
+          <div style="width:25px;height:12px;border:1.6px solid #2E2A26;border-radius:3.5px;padding:1.6px"><div style="width:68%;height:100%;background:#2E2A26;border-radius:1.5px"></div></div>
+        </div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:4px 20px 10px">
+        <div style="width:44px;height:44px;border-radius:14px;background:#fff;border:1.5px solid #EBE1D2;display:flex;align-items:center;justify-content:center;font:400 22px/1 'Hanken Grotesk';color:#6B635B">✕</div>
+        <span style="font:800 18px 'Hanken Grotesk';color:#2E2A26">👤 Name people</span>
+        <span style="font:700 15px 'Hanken Grotesk';color:#A79C8E;width:44px;text-align:right">5 / 18</span>
+      </div>
+      <div style="flex:0 0 auto;margin:0 20px;height:8px;border-radius:5px;background:#EFE7DA;overflow:hidden"><div style="width:28%;height:100%;background:#7A8B6F;border-radius:5px"></div></div>
+      <div style="flex:1;display:flex;flex-direction:column;padding:16px 20px 0;overflow:hidden">
+        <div style="flex:0 0 auto;height:212px;border-radius:22px;overflow:hidden;background:#B59BA0;position:relative"><div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.18))"></div></div>
+        <h2 style="margin:18px 0 4px;font:800 23px 'Hanken Grotesk';color:#2E2A26;text-align:center;letter-spacing:-.01em">Do you recognize anyone?</h2>
+        <p style="margin:0 0 16px;text-align:center;font:500 16px 'Hanken Grotesk';color:#A79C8E">Tap a name, or add someone new.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="height:54px;border-radius:14px;background:#fff;border:1.5px solid #E3D8C8;display:flex;align-items:center;gap:10px;padding:0 14px;font:700 16px 'Hanken Grotesk';color:#2E2A26"><span style="width:30px;height:30px;border-radius:50%;background:#7A8B6F;color:#fff;display:flex;align-items:center;justify-content:center;font:800 11px 'Hanken Grotesk'">GJ</span>Grandma Jean</div>
+          <div style="height:54px;border-radius:14px;background:#fff;border:1.5px solid #E3D8C8;display:flex;align-items:center;gap:10px;padding:0 14px;font:700 16px 'Hanken Grotesk';color:#2E2A26"><span style="width:30px;height:30px;border-radius:50%;background:#C4704F;color:#fff;display:flex;align-items:center;justify-content:center;font:800 11px 'Hanken Grotesk'">UM</span>Uncle Mike</div>
+          <div style="height:54px;border-radius:14px;background:#fff;border:1.5px solid #E3D8C8;display:flex;align-items:center;gap:10px;padding:0 14px;font:700 16px 'Hanken Grotesk';color:#2E2A26"><span style="width:30px;height:30px;border-radius:50%;background:#B08A6B;color:#fff;display:flex;align-items:center;justify-content:center;font:800 11px 'Hanken Grotesk'">AC</span>Aunt Carol</div>
+          <div style="height:54px;border-radius:14px;background:#fff;border:1.5px solid #E3D8C8;display:flex;align-items:center;gap:10px;padding:0 14px;font:700 16px 'Hanken Grotesk';color:#2E2A26"><span style="width:30px;height:30px;border-radius:50%;background:#8C7BA0;color:#fff;display:flex;align-items:center;justify-content:center;font:800 11px 'Hanken Grotesk'">CD</span>Cousin Dave</div>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:10px">
+          <div style="flex:1;height:54px;border-radius:14px;background:#fff;border:1.6px dashed #D9CAB3;display:flex;align-items:center;justify-content:center;gap:7px;font:700 16px 'Hanken Grotesk';color:#7A7066">＋ Add new</div>
+          <div style="flex:1;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;font:700 16px 'Hanken Grotesk';color:#A79C8E">No one I know</div>
+        </div>
+        <div style="margin-top:auto;padding:14px 0 8px;text-align:center;font:700 15px 'Hanken Grotesk';color:#6C7C62;background:#EEF1E9;border-radius:14px">🎉 12 people named today — keep going!</div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;justify-content:center;padding:6px 0 11px"><div style="width:134px;height:5px;border-radius:3px;background:#2E2A26;opacity:.22"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DETECTIVE — STORY ============ -->
+<div style="position:absolute;left:1506px;top:2000px;width:412px">
+  <div data-drags-parent="1" style="font:700 13px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#9a8f80;margin:0 0 16px 8px">Detective · tell a story</div>
+  <div style="width:412px;height:862px;background:#191613;border-radius:56px;padding:11px;box-shadow:0 30px 60px -18px rgba(45,30,15,.4)">
+    <div data-screen-label="Detective story" style="position:relative;width:390px;height:840px;background:#FAF6F0;border-radius:46px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="flex:0 0 auto;height:52px;display:flex;align-items:center;justify-content:space-between;padding:14px 30px 0;font:700 16px 'Hanken Grotesk';color:#2E2A26">
+        <span>9:41</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:flex;gap:2.5px;align-items:flex-end;height:11px"><div style="width:3px;height:5px;background:#2E2A26;border-radius:1px"></div><div style="width:3px;height:7px;background:#2E2A26;border-radius:1px"></div><div style="width:3px;height:9px;background:#2E2A26;border-radius:1px"></div><div style="width:3px;height:11px;background:#2E2A26;border-radius:1px"></div></div>
+          <div style="width:25px;height:12px;border:1.6px solid #2E2A26;border-radius:3.5px;padding:1.6px"><div style="width:68%;height:100%;background:#2E2A26;border-radius:1.5px"></div></div>
+        </div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:4px 20px 10px">
+        <div style="width:44px;height:44px;border-radius:14px;background:#fff;border:1.5px solid #EBE1D2;display:flex;align-items:center;justify-content:center;font:400 22px/1 'Hanken Grotesk';color:#6B635B">✕</div>
+        <span style="font:800 18px 'Hanken Grotesk';color:#2E2A26">📝 Tell a story</span>
+        <span style="font:700 15px 'Hanken Grotesk';color:#A79C8E;width:44px;text-align:right">9 / 27</span>
+      </div>
+      <div style="flex:0 0 auto;margin:0 20px;height:8px;border-radius:5px;background:#EFE7DA;overflow:hidden"><div style="width:33%;height:100%;background:#7A8B6F;border-radius:5px"></div></div>
+      <div style="flex:1;display:flex;flex-direction:column;padding:16px 20px 0;overflow:hidden">
+        <div style="flex:0 0 auto;height:168px;border-radius:22px;overflow:hidden;background:#A8B69C;position:relative"><div style="position:absolute;inset:0;background:linear-gradient(150deg,rgba(255,250,242,.25),rgba(45,35,25,.18))"></div></div>
+        <h2 style="margin:18px 0 4px;font:800 23px 'Hanken Grotesk';color:#2E2A26;text-align:center;letter-spacing:-.01em">What do you remember?</h2>
+        <p style="margin:0 0 14px;text-align:center;font:500 16px 'Hanken Grotesk';color:#A79C8E">A sentence is plenty — or tap the mic to talk.</p>
+        <div style="position:relative;height:150px;border-radius:18px;background:#fff;border:1.5px solid #E3D8C8;padding:16px">
+          <span style="font:500 17px/1.5 'Hanken Grotesk';color:#B7AC9D">Who's here, what were they doing, what made this day special…</span>
+          <div style="position:absolute;right:12px;bottom:12px;width:50px;height:50px;border-radius:50%;background:#C4704F;display:flex;align-items:center;justify-content:center;font-size:23px;box-shadow:0 8px 18px -4px rgba(196,112,79,.5)">🎤</div>
+        </div>
+        <div style="margin-top:14px;height:60px;border-radius:18px;background:#C4704F;display:flex;align-items:center;justify-content:center;color:#fff;font:800 18px 'Hanken Grotesk';box-shadow:0 12px 24px -6px rgba(196,112,79,.45)">Save memory</div>
+        <div style="margin-top:8px;height:48px;display:flex;align-items:center;justify-content:center;font:700 16px 'Hanken Grotesk';color:#A79C8E">Skip for now</div>
+        <div style="margin-top:auto;padding:8px 0 8px;text-align:center;font:700 15px 'Hanken Grotesk';color:#6C7C62;background:#EEF1E9;border-radius:14px">🎉 3 stories saved today</div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;justify-content:center;padding:6px 0 11px"><div style="width:134px;height:5px;border-radius:3px;background:#2E2A26;opacity:.22"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DETECTIVE — DONE / CELEBRATION ============ -->
+<div style="position:absolute;left:2008px;top:2000px;width:412px">
+  <div data-drags-parent="1" style="font:700 13px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#9a8f80;margin:0 0 16px 8px">Detective · all done</div>
+  <div style="width:412px;height:862px;background:#191613;border-radius:56px;padding:11px;box-shadow:0 30px 60px -18px rgba(45,30,15,.4)">
+    <div data-screen-label="Detective done" style="position:relative;width:390px;height:840px;background:#FAF6F0;border-radius:46px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="position:absolute;top:90px;left:40px;width:11px;height:11px;border-radius:3px;background:#C4704F;transform:rotate(20deg)"></div>
+      <div style="position:absolute;top:130px;left:300px;width:10px;height:10px;border-radius:50%;background:#7A8B6F"></div>
+      <div style="position:absolute;top:175px;left:70px;width:9px;height:9px;border-radius:2px;background:#C9A14A;transform:rotate(40deg)"></div>
+      <div style="position:absolute;top:110px;left:200px;width:8px;height:8px;border-radius:50%;background:#8C7BA0"></div>
+      <div style="position:absolute;top:200px;left:330px;width:11px;height:11px;border-radius:3px;background:#C4704F;transform:rotate(-15deg)"></div>
+      <div style="position:absolute;top:240px;left:120px;width:8px;height:8px;border-radius:50%;background:#7A8B6F"></div>
+      <div style="flex:0 0 auto;height:52px;display:flex;align-items:center;justify-content:space-between;padding:14px 30px 0;font:700 16px 'Hanken Grotesk';color:#2E2A26">
+        <span>9:41</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:flex;gap:2.5px;align-items:flex-end;height:11px"><div style="width:3px;height:5px;background:#2E2A26;border-radius:1px"></div><div style="width:3px;height:7px;background:#2E2A26;border-radius:1px"></div><div style="width:3px;height:9px;background:#2E2A26;border-radius:1px"></div><div style="width:3px;height:11px;background:#2E2A26;border-radius:1px"></div></div>
+          <div style="width:25px;height:12px;border:1.6px solid #2E2A26;border-radius:3.5px;padding:1.6px"><div style="width:68%;height:100%;background:#2E2A26;border-radius:1.5px"></div></div>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:18px 32px 0;position:relative;z-index:1">
+        <div style="margin-top:18px;width:104px;height:104px;border-radius:50%;background:#C4704F;display:flex;align-items:center;justify-content:center;font-size:50px;box-shadow:0 18px 36px -8px rgba(196,112,79,.5)">🏆</div>
+        <h1 style="margin:26px 0 10px;font:800 30px/1.15 'Hanken Grotesk';letter-spacing:-.01em;color:#2E2A26">You're on a roll!</h1>
+        <p style="margin:0;font:500 18px/1.5 'Hanken Grotesk';color:#7A7066">You added details to 12 photos today. Thank you for keeping Jeff's memory alive.</p>
+        <div style="margin-top:24px;width:100%;background:#fff;border:1.5px solid #EFE6D8;border-radius:20px;padding:18px;box-shadow:0 8px 20px rgba(60,45,30,.05)">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px">
+            <span style="font:700 15px 'Hanken Grotesk';color:#2E2A26">Jeff Rice memory</span>
+            <span style="font:800 16px 'Hanken Grotesk';color:#7A8B6F">68% complete</span>
+          </div>
+          <div style="height:14px;border-radius:8px;background:#F0EAE0;overflow:hidden"><div style="width:68%;height:100%;background:#7A8B6F;border-radius:8px"></div></div>
+          <div style="display:flex;gap:24px;margin-top:16px">
+            <div style="text-align:left"><div style="font:800 24px 'Hanken Grotesk';color:#2E2A26">🔥 3</div><div style="font:500 13px 'Hanken Grotesk';color:#A79C8E">day streak</div></div>
+            <div style="text-align:left"><div style="font:800 24px 'Hanken Grotesk';color:#2E2A26">64</div><div style="font:500 13px 'Hanken Grotesk';color:#A79C8E">details added</div></div>
+            <div style="text-align:left"><div style="font:800 24px 'Hanken Grotesk';color:#2E2A26">🥇</div><div style="font:500 13px 'Hanken Grotesk';color:#A79C8E">top helper</div></div>
+          </div>
+        </div>
+      </div>
+      <div style="flex:0 0 auto;padding:0 26px 6px;display:flex;flex-direction:column;gap:12px;position:relative;z-index:1">
+        <div style="height:62px;border-radius:18px;background:#C4704F;display:flex;align-items:center;justify-content:center;color:#fff;font:800 19px 'Hanken Grotesk';box-shadow:0 12px 24px -6px rgba(196,112,79,.45)">Keep going</div>
+        <div style="height:62px;border-radius:18px;background:#fff;border:1.5px solid #E3D8C8;display:flex;align-items:center;justify-content:center;color:#2E2A26;font:800 19px 'Hanken Grotesk'">Done for now</div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;justify-content:center;padding:14px 0 11px"><div style="width:134px;height:5px;border-radius:3px;background:#2E2A26;opacity:.22"></div></div>
+    </div>
+  </div>
+</div>
+<!-- ============ IDENTITY — WHO ARE YOU ============ -->
+<div style="position:absolute;left:4016px;top:0;width:412px">
+  <div data-drags-parent="1" style="font:700 13px 'Hanken Grotesk';letter-spacing:.14em;text-transform:uppercase;color:#9a8f80;margin:0 0 16px 8px">Identity · who are you (after password / new device)</div>
+  <div style="width:412px;height:862px;background:#191613;border-radius:56px;padding:11px;box-shadow:0 30px 60px -18px rgba(45,30,15,.4)">
+    <div data-screen-label="Who are you" style="position:relative;width:390px;height:840px;background:#FAF6F0;border-radius:46px;overflow:hidden;display:flex;flex-direction:column">
+      <div style="flex:0 0 auto;height:52px;display:flex;align-items:center;justify-content:space-between;padding:14px 30px 0;font:700 16px 'Hanken Grotesk';color:#2E2A26">
+        <span>9:41</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="display:flex;gap:2.5px;align-items:flex-end;height:11px"><div style="width:3px;height:5px;background:#2E2A26;border-radius:1px"></div><div style="width:3px;height:7px;background:#2E2A26;border-radius:1px"></div><div style="width:3px;height:9px;background:#2E2A26;border-radius:1px"></div><div style="width:3px;height:11px;background:#2E2A26;border-radius:1px"></div></div>
+          <div style="width:25px;height:12px;border:1.6px solid #2E2A26;border-radius:3.5px;padding:1.6px"><div style="width:68%;height:100%;background:#2E2A26;border-radius:1.5px"></div></div>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;padding:8px 24px 0">
+        <div style="display:flex;align-items:center;gap:9px;margin-top:6px;font:700 13px 'Hanken Grotesk';letter-spacing:.06em;text-transform:uppercase;color:#A79C8E">
+          <span style="width:26px;height:26px;border-radius:8px;background:#C2B193;display:inline-block"></span> Jeff Rice · unlocked
+        </div>
+        <h1 style="margin:22px 0 10px;font:800 31px/1.12 'Hanken Grotesk';letter-spacing:-.02em;color:#2E2A26">Who are you?</h1>
+        <p style="margin:0 0 22px;font:500 17px/1.5 'Hanken Grotesk';color:#7A7066">Pick your name so we can credit what you add. We'll remember you on this device.</p>
+        <div style="display:flex;flex-direction:column;gap:11px">
+          <div style="height:62px;border-radius:16px;background:#fff;border:1.5px solid #EBE1D2;display:flex;align-items:center;gap:13px;padding:0 16px;box-shadow:0 6px 16px rgba(60,45,30,.04)">
+            <span style="width:40px;height:40px;border-radius:50%;background:#C4704F;color:#fff;display:flex;align-items:center;justify-content:center;font:800 15px 'Hanken Grotesk'">S</span>
+            <span style="font:800 18px 'Hanken Grotesk';color:#2E2A26">Sarah</span>
+            <span style="margin-left:auto;font:400 24px 'Hanken Grotesk';color:#C4B9A8">›</span>
+          </div>
+          <div style="height:62px;border-radius:16px;background:#fff;border:1.5px solid #EBE1D2;display:flex;align-items:center;gap:13px;padding:0 16px;box-shadow:0 6px 16px rgba(60,45,30,.04)">
+            <span style="width:40px;height:40px;border-radius:50%;background:#7A8B6F;color:#fff;display:flex;align-items:center;justify-content:center;font:800 15px 'Hanken Grotesk'">GJ</span>
+            <span style="font:800 18px 'Hanken Grotesk';color:#2E2A26">Grandma Jean</span>
+            <span style="margin-left:auto;font:400 24px 'Hanken Grotesk';color:#C4B9A8">›</span>
+          </div>
+          <div style="height:62px;border-radius:16px;background:#fff;border:1.5px solid #EBE1D2;display:flex;align-items:center;gap:13px;padding:0 16px;box-shadow:0 6px 16px rgba(60,45,30,.04)">
+            <span style="width:40px;height:40px;border-radius:50%;background:#B08A6B;color:#fff;display:flex;align-items:center;justify-content:center;font:800 15px 'Hanken Grotesk'">UM</span>
+            <span style="font:800 18px 'Hanken Grotesk';color:#2E2A26">Uncle Mike</span>
+            <span style="margin-left:auto;font:400 24px 'Hanken Grotesk';color:#C4B9A8">›</span>
+          </div>
+          <div style="height:62px;border-radius:16px;background:#fff;border:1.5px solid #EBE1D2;display:flex;align-items:center;gap:13px;padding:0 16px;box-shadow:0 6px 16px rgba(60,45,30,.04)">
+            <span style="width:40px;height:40px;border-radius:50%;background:#8C7BA0;color:#fff;display:flex;align-items:center;justify-content:center;font:800 15px 'Hanken Grotesk'">B</span>
+            <span style="font:800 18px 'Hanken Grotesk';color:#2E2A26">Bryant</span>
+            <span style="margin-left:auto;font:400 24px 'Hanken Grotesk';color:#C4B9A8">›</span>
+          </div>
+        </div>
+        <div style="margin-top:14px;height:60px;border-radius:16px;background:#C4704F;display:flex;align-items:center;justify-content:center;gap:9px;color:#fff;font:800 18px 'Hanken Grotesk';box-shadow:0 12px 24px -6px rgba(196,112,79,.45)">＋ I'm someone new</div>
+        <div style="margin-top:auto;padding:18px 0 6px;text-align:center;font:500 14px/1.45 'Hanken Grotesk';color:#A79C8E">On a new phone or browser? Just pick your name again — nothing is lost.</div>
+      </div>
+      <div style="flex:0 0 auto;display:flex;justify-content:center;padding:4px 0 11px"><div style="width:134px;height:5px;border-radius:3px;background:#2E2A26;opacity:.22"></div></div>
+    </div>
+  </div>
+</div></x-dc>
+</body>
+</html>

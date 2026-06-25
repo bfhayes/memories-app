@@ -1,0 +1,3 @@
+# Local dev secrets (copy to .dev.vars — gitignored). Wrangler auto-loads .dev.vars.
+# Signs the per-Memory access cookie. Any random string works locally.
+AUTH_SECRET=dev-secret-do-not-use-in-production

@@ -1,0 +1,24 @@
+{
+  "name": "memories-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "npm install && cd frontend && npm install && npm run build",
+    "dev:api": "wrangler pages dev --proxy 5173 --persist-to .wrangler/state",
+    "dev:frontend": "cd frontend && npm run dev",
+    "test": "vitest run && cd frontend && npx vitest run",
+    "test:functions": "vitest run",
+    "test:frontend": "cd frontend && npx vitest run",
+    "typecheck": "cd frontend && npx tsc -b",
+    "db:migrate": "wrangler d1 execute memories-app --file=migrations/0001_init.sql",
+    "db:migrate:local": "wrangler d1 execute memories-app --local --persist-to .wrangler/state --file=migrations/0001_init.sql"
+  },
+  "dependencies": {
+    "jose": "^6.2.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260410.1",
+    "vitest": "^4.1.4",
+    "wrangler": "^4.81.1"
+  }
+}
