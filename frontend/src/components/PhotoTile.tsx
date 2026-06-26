@@ -66,15 +66,14 @@ export default function PhotoTile({
     </div>
   );
 
-  if (selectMode) {
-    return (
-      <div className="mb-2.5 break-inside-avoid" onClick={() => onToggle?.(photo.id)}>
-        {inner}
-      </div>
-    );
-  }
+  // Always a <Link> so the tile/image isn't remounted when toggling select mode (which would
+  // drop cached images to opacity:0). In select mode we intercept the click to toggle instead.
   return (
-    <Link to={`/m/${memoryId}/photo/${photo.id}`} className="mb-2.5 block break-inside-avoid active:scale-[0.99]">
+    <Link
+      to={`/m/${memoryId}/photo/${photo.id}`}
+      onClick={(e) => { if (selectMode) { e.preventDefault(); onToggle?.(photo.id); } }}
+      className="mb-2.5 block break-inside-avoid active:scale-[0.99]"
+    >
       {inner}
     </Link>
   );

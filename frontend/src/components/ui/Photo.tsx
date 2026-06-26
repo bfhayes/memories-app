@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { clsx } from 'clsx';
 
 /**
@@ -28,6 +28,14 @@ export default function Photo({
   style?: CSSProperties;
 }) {
   const [loaded, setLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // A cached image can already be `complete` before React attaches onLoad (e.g. after the tile
+  // remounts on entering select mode), in which case onLoad never fires — catch that here so the
+  // image doesn't get stuck invisible at opacity:0.
+  useEffect(() => {
+    if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) setLoaded(true);
+  }, [src]);
 
   return (
     <div
@@ -36,6 +44,7 @@ export default function Photo({
     >
       {src && (
         <img
+          ref={imgRef}
           src={src}
           alt={alt}
           loading={loading}

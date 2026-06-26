@@ -261,13 +261,13 @@ export default function LibraryPage() {
         </main>
       </div>
 
-      {/* Selection action bar */}
+      {/* Selection action bar — a centered floating pill, off the bottom edge. */}
       {selectMode && selected.size > 0 && (
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line-divider bg-warm/95 px-5 py-3.5 backdrop-blur safe-bottom sm:px-6">
-          <div className="mx-auto flex max-w-2xl items-center gap-3">
-            <span className="text-[16px] font-extrabold text-ink">{selected.size} selected</span>
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-5 safe-bottom">
+          <div className="pointer-events-auto flex items-center gap-3 rounded-full border border-line bg-warm/95 py-2.5 pl-5 pr-2.5 shadow-pop backdrop-blur">
+            <span className="whitespace-nowrap text-[16px] font-extrabold text-ink">{selected.size} selected</span>
             <button onClick={() => setSelected(new Set())} className="text-[15px] font-bold text-muted hover:text-ink">Clear</button>
-            <Button size="md" className="ml-auto" onClick={() => setBulkOpen(true)}>Edit together</Button>
+            <Button size="md" className="rounded-full" onClick={() => setBulkOpen(true)}>Edit together</Button>
           </div>
         </div>
       )}
