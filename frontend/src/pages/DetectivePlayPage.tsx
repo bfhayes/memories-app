@@ -40,6 +40,7 @@ export default function DetectivePlayPage() {
   const [index, setIndex] = useState(0);
   const [completed, setCompleted] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [storyOpen, setStoryOpen] = useState(false); // optional "tell more" on non-story missions
 
   // Per-photo drafts
   const [draftDate, setDraftDate] = useState<PhotoDate>({ value: null, confidence: 'unknown', label: null });
@@ -59,6 +60,7 @@ export default function DetectivePlayPage() {
   useEffect(() => {
     setDraftDate({ value: null, confidence: 'unknown', label: null });
     setDraftText('');
+    setStoryOpen(false);
   }, [current?.id]);
 
   // When we run off the end, load more or finish.
@@ -75,10 +77,28 @@ export default function DetectivePlayPage() {
   const advance = () => { if (busy) return; setIndex((i) => i + 1); };
   const cheer = CHEERS[completed % CHEERS.length];
 
+  // The optional "tell more" story is captured in draftText on non-story missions. Save it too when
+  // the user moves on, so going above-and-beyond never gets lost. (Only when the photo has no story.)
+  const flushStory = async () => {
+    if (mission.key !== 'story' && current && !current.hasStory && draftText.trim()) {
+      await api.patchPhoto(current.id, { about: draftText.trim() });
+      return true;
+    }
+    return false;
+  };
+
   const saveAndNext = async (fn: () => Promise<void>) => {
     setBusy(true);
-    try { await fn(); setCompleted((c) => c + 1); advance(); }
+    try { await fn(); await flushStory(); setCompleted((c) => c + 1); advance(); }
     finally { setBusy(false); }
+  };
+
+  const skip = async () => {
+    if (busy) return;
+    setBusy(true);
+    try { if (await flushStory()) setCompleted((c) => c + 1); }
+    finally { setBusy(false); }
+    setIndex((i) => i + 1);
   };
 
   if (query.isLoading || (!current && query.hasNextPage)) {
@@ -182,6 +202,44 @@ export default function DetectivePlayPage() {
             onAdd={(loc) => saveAndNext(async () => { await api.patchPhoto(current.id, { location: loc }); })}
           />
         )}
+
+        {/* Optional: go above and beyond — add a story even when this isn't the story mission. */}
+        {mission.key !== 'story' && !current.hasStory && (
+          <div className="mt-5">
+            {!storyOpen ? (
+              <button
+                onClick={() => setStoryOpen(true)}
+                className="flex items-center gap-1.5 text-[15px] font-bold text-sage-dark hover:text-sage"
+              >
+                ✍️ Tell more about this photo
+              </button>
+            ) : (
+              <div>
+                <p className="mb-2 text-[14px] font-semibold text-muted">Anything else you remember? (optional)</p>
+                <div className="relative">
+                  <textarea
+                    autoFocus
+                    value={draftText}
+                    onChange={(e) => setDraftText(e.target.value)}
+                    placeholder="Who’s here, what was happening, the story behind it…"
+                    rows={3}
+                    className="w-full resize-none rounded-[16px] border border-line bg-white p-4 pr-14 text-[17px] font-medium leading-[1.5] text-body placeholder:text-placeholder outline-none focus:border-terracotta focus:ring-4 focus:ring-terracotta/10"
+                  />
+                  {speech.supported && (
+                    <button
+                      onClick={speech.toggle}
+                      aria-label="Dictate"
+                      className={clsx('absolute bottom-3 right-3 grid h-10 w-10 place-items-center rounded-full transition active:scale-90', speech.listening ? 'bg-terracotta text-white animate-pulse' : 'bg-chip text-muted')}
+                    >
+                      <Mic size={20} />
+                    </button>
+                  )}
+                </div>
+                <p className="mt-1.5 text-[13px] text-faint">Saved when you continue.</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Encouragement */}
@@ -201,7 +259,7 @@ export default function DetectivePlayPage() {
             Save memory
           </Button>
         )}
-        <button onClick={advance} disabled={busy} className="flex items-center justify-center gap-1.5 py-2 text-[16px] font-bold text-muted hover:text-ink disabled:opacity-50 disabled:pointer-events-none">
+        <button onClick={skip} disabled={busy} className="flex items-center justify-center gap-1.5 py-2 text-[16px] font-bold text-muted hover:text-ink disabled:opacity-50 disabled:pointer-events-none">
           <SkipForward size={17} /> {mission.key === 'people' ? 'No one I know' : 'Skip for now'}
         </button>
       </div>
