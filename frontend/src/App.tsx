@@ -2,7 +2,6 @@ import { Routes, Route, useParams, Navigate, Outlet } from 'react-router-dom';
 import { MemoryProvider, useMemory } from './context/MemoryContext';
 import Spinner from './components/ui/Spinner';
 import HubPage from './pages/HubPage';
-import CreateMemoryPage from './pages/CreateMemoryPage';
 import GatePage from './pages/GatePage';
 import IdentityPage from './pages/IdentityPage';
 import HomePage from './pages/HomePage';
@@ -47,7 +46,8 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<HubPage />} />
-      <Route path="/new" element={<CreateMemoryPage />} />
+      {/* "Create a memory" is temporarily disabled — the page stays in the codebase. */}
+      <Route path="/new" element={<Navigate to="/" replace />} />
       <Route path="/m/:memoryId" element={<MemoryShell />}>
         <Route index element={<HomePage />} />
         <Route path="upload" element={<UploadPage />} />

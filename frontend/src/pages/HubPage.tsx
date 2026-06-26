@@ -1,11 +1,10 @@
 import { Link } from 'react-router-dom';
-import { ChevronRight, Lock, Plus } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import { useMemories } from '../hooks/queries';
 import Brand from '../components/Brand';
 import Photo from '../components/ui/Photo';
 import Spinner from '../components/ui/Spinner';
 import EmptyState from '../components/ui/EmptyState';
-import Button from '../components/ui/Button';
 import type { MemorySummary } from '../lib/types';
 
 function MemoryCard({ memory }: { memory: MemorySummary }) {
@@ -55,29 +54,14 @@ export default function HubPage() {
         {isLoading ? (
           <div className="grid place-items-center py-16 text-terracotta"><Spinner size={28} /></div>
         ) : !memories || memories.length === 0 ? (
-          <EmptyState
-            glyph="🖼️"
-            title="No memories yet"
-            action={
-              <Link to="/new"><Button block>Create your first memory</Button></Link>
-            }
-          >
-            Start a private collection for a person or an event, then invite the family to add photos.
+          <EmptyState glyph="🖼️" title="No memories yet">
+            Your family memories will appear here.
           </EmptyState>
         ) : (
           <div className="flex flex-col gap-3">
             {memories.map((m) => (
               <MemoryCard key={m.id} memory={m} />
             ))}
-
-            <Link
-              to="/new"
-              className="flex items-center justify-center gap-2 rounded-[22px] border-2 border-dashed bg-transparent py-5 text-[16px] font-bold text-muted transition hover:border-terracotta hover:text-terracotta active:scale-[0.99]"
-              style={{ borderColor: 'var(--color-dashed)' }}
-            >
-              <Plus size={19} strokeWidth={2.6} /> Create a new memory
-              <ChevronRight size={18} className="opacity-50" />
-            </Link>
           </div>
         )}
       </main>
