@@ -51,13 +51,18 @@ export default function LibraryPage() {
   const { data: stats } = useStats(memoryId);
   const { data: suggestions } = useSuggestions(memoryId);
   const toggleLike = useLike(memoryId);
-  const query = usePhotosInfinite(memoryId, {
-    filter: filters.filter,
-    sort: filters.sort,
-    q: qDebounced || undefined,
-    decade: filters.decade,
-    person: filters.person,
-  });
+  const query = usePhotosInfinite(
+    memoryId,
+    {
+      filter: filters.filter,
+      sort: filters.sort,
+      q: qDebounced || undefined,
+      decade: filters.decade,
+      person: filters.person,
+    },
+    true,
+    selectMode ? false : 10000, // live-refresh the grid, but hold still while multi-selecting
+  );
 
   const photos = useMemo(() => query.data?.pages.flatMap((p) => p.photos) ?? [], [query.data]);
 

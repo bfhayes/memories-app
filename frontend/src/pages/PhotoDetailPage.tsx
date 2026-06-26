@@ -18,6 +18,7 @@ import Sheet from '../components/ui/Sheet';
 import Button from '../components/ui/Button';
 import AutosaveNote from '../components/ui/AutosaveNote';
 import MetaCard from '../components/detail/MetaCard';
+import FieldHistory from '../components/detail/FieldHistory';
 import DateEditor from '../components/editors/DateEditor';
 import ChipSuggestInput from '../components/editors/ChipSuggestInput';
 import type { PhotoDate } from '../lib/types';
@@ -27,9 +28,12 @@ function AutoTextarea({
 }: { value: string; placeholder: string; onSave: (v: string) => void }) {
   const [text, setText] = useState(value);
   const ref = useRef<HTMLTextAreaElement>(null);
+  const editingRef = useRef(false); // focused or has unsaved keystrokes
   const debounced = useDebouncedCallback(onSave, 700);
 
-  useEffect(() => { setText(value); }, [value]);
+  // Adopt the server value ONLY when not actively editing, so background polling / a concurrent
+  // editor never clobbers what you're typing. Your save still wins (and prior text is kept in history).
+  useEffect(() => { if (!editingRef.current) setText(value); }, [value]);
   useEffect(() => {
     const el = ref.current;
     if (el) { el.style.height = 'auto'; el.style.height = `${el.scrollHeight}px`; }
@@ -40,8 +44,9 @@ function AutoTextarea({
       ref={ref}
       value={text}
       placeholder={placeholder}
-      onChange={(e) => { setText(e.target.value); debounced(e.target.value); }}
-      onBlur={() => onSave(text)}
+      onFocus={() => { editingRef.current = true; }}
+      onChange={(e) => { editingRef.current = true; setText(e.target.value); debounced(e.target.value); }}
+      onBlur={() => { onSave(text); editingRef.current = false; }}
       rows={2}
       className="w-full resize-none bg-transparent text-[17px] font-medium leading-[1.55] text-body placeholder:text-placeholder outline-none"
     />
@@ -120,8 +125,18 @@ export default function PhotoDetailPage() {
 
         <div className="mt-4 flex flex-col gap-3.5">
           {/* DATE — emphasized, priority field */}
-          <button onClick={() => setDateOpen(true)} className="text-left">
-            <MetaCard label="When was this taken?" emphasized>
+          <MetaCard
+            label="When was this taken?"
+            emphasized
+            right={<FieldHistory
+              activity={photo.activity}
+              field="date"
+              label="Date"
+              onRestore={(p) => { try { const d = JSON.parse(p); editor.setDate({ value: d.value, confidence: d.confidence, label: d.label }); } catch { /* ignore */ } }}
+              renderPrev={(p) => { try { return JSON.parse(p).label || 'a date'; } catch { return p; } }}
+            />}
+          >
+            <button onClick={() => setDateOpen(true)} className="w-full text-left">
               {dateKnown ? (
                 <div className="flex items-center gap-2.5">
                   <span className="text-[24px] font-extrabold tracking-[-0.01em] text-ink">{photo.date.label}</span>
@@ -133,8 +148,8 @@ export default function PhotoDetailPage() {
                 <span className="text-[20px] font-extrabold text-terracotta/80">Add a date</span>
               )}
               <p className="mt-2 text-[14px] font-semibold text-muted2">⭐ The most helpful thing to add</p>
-            </MetaCard>
-          </button>
+            </button>
+          </MetaCard>
 
           {/* PEOPLE */}
           <MetaCard label="Who’s in this photo?" glyph="👤">
@@ -160,7 +175,11 @@ export default function PhotoDetailPage() {
           </MetaCard>
 
           {/* LOCATION */}
-          <MetaCard label="Where was this?" glyph="📍">
+          <MetaCard
+            label="Where was this?"
+            glyph="📍"
+            right={<FieldHistory activity={photo.activity} field="location" label="Location" onRestore={(p) => editor.setLocation(p)} />}
+          >
             {photo.location && !editingLocation ? (
               <button onClick={() => setEditingLocation(true)} className="flex w-full items-center gap-2 text-left">
                 <MapPin size={18} className="text-terracotta" />
@@ -189,7 +208,11 @@ export default function PhotoDetailPage() {
           </MetaCard>
 
           {/* ABOUT */}
-          <MetaCard label="About this photo" glyph="✍️">
+          <MetaCard
+            label="About this photo"
+            glyph="✍️"
+            right={<FieldHistory activity={photo.activity} field="about" label="Story" onRestore={(p) => editor.setAbout(p)} />}
+          >
             <AutoTextarea
               value={photo.about ?? ''}
               placeholder="Share what you remember — who, what, the story behind it…"

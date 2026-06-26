@@ -76,7 +76,7 @@ export function deriveDate(
   };
 }
 
-/** Append an attributed activity row. */
+/** Append an attributed activity row. `field`/`prevValue` capture restorable edit history. */
 export async function logActivity(
   db: D1Database,
   opts: {
@@ -85,12 +85,14 @@ export async function logActivity(
     caller: Caller | null;
     action: string;
     detail: string;
+    field?: string | null;
+    prevValue?: string | null;
   },
 ): Promise<void> {
   await run(
     db,
-    `INSERT INTO activity (memory_id, photo_id, contributor_id, contributor_name, accent, action, detail, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO activity (memory_id, photo_id, contributor_id, contributor_name, accent, action, detail, field, prev_value, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     opts.memoryId,
     opts.photoId,
     opts.caller?.id ?? null,
@@ -98,6 +100,8 @@ export async function logActivity(
     opts.caller?.accent ?? '#C4704F',
     opts.action,
     opts.detail,
+    opts.field ?? null,
+    opts.prevValue ?? null,
     nowIso(),
   );
 }

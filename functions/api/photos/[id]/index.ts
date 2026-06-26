@@ -46,9 +46,9 @@ async function getFull(db: D1Database, id: number, callerId: number) {
     'SELECT tag FROM photo_tags WHERE photo_id = ? ORDER BY created_at ASC',
     id,
   );
-  const activity = await all<{ id: number; contributor_name: string; accent: string; action: string; detail: string; created_at: string }>(
+  const activity = await all<{ id: number; contributor_name: string; accent: string; action: string; detail: string; field: string | null; prev_value: string | null; created_at: string }>(
     db,
-    `SELECT id, contributor_name, accent, action, detail, created_at
+    `SELECT id, contributor_name, accent, action, detail, field, prev_value, created_at
        FROM activity WHERE photo_id = ? ORDER BY created_at DESC`,
     id,
   );
@@ -74,6 +74,8 @@ async function getFull(db: D1Database, id: number, callerId: number) {
       accent: a.accent,
       action: a.action,
       detail: a.detail,
+      field: a.field,
+      prevValue: a.prev_value,
       createdAt: a.created_at,
     })),
     meta: {
@@ -119,42 +121,68 @@ export const onRequestPatch = async (context: CFContext): Promise<Response> => {
   const caller = await getCaller(context, memoryId);
   const db = context.env.DB;
 
+  // Snapshot the current values so we can record the PREVIOUS value (restorable history) and skip
+  // no-op saves. Edits are last-write-wins, but the prior value is never lost.
+  const before = await first<{ about: string | null; notes: string | null; location: string | null; date_value: string | null; date_confidence: string; date_label: string | null }>(
+    db,
+    'SELECT about, notes, location, date_value, date_confidence, date_label FROM photos WHERE id = ?',
+    id,
+  );
+
   if ('date' in body) {
     const date = (body.date ?? {}) as { value?: string; confidence?: string; label?: string };
     const d = deriveDate(date.value, (date.confidence as DateConfidence) ?? 'unknown', date.label);
-    await run(
-      db,
-      `UPDATE photos SET date_value=?, date_confidence=?, date_label=?, date_sort=?, date_year=?, updated_at=? WHERE id=?`,
-      d.value, d.confidence, d.label, d.sort, d.year, nowIso(), id,
-    );
-    await logActivity(db, {
-      memoryId, photoId: id, caller, action: 'set_date',
-      detail: d.confidence === 'unknown' ? 'cleared the date' : `set the date to ${d.label}`,
-    });
+    const changed = d.value !== (before?.date_value ?? null) || d.confidence !== (before?.date_confidence ?? 'unknown');
+    if (changed) {
+      await run(
+        db,
+        `UPDATE photos SET date_value=?, date_confidence=?, date_label=?, date_sort=?, date_year=?, updated_at=? WHERE id=?`,
+        d.value, d.confidence, d.label, d.sort, d.year, nowIso(), id,
+      );
+      const hadDate = (before?.date_confidence ?? 'unknown') !== 'unknown';
+      await logActivity(db, {
+        memoryId, photoId: id, caller, action: 'set_date',
+        detail: d.confidence === 'unknown' ? 'cleared the date' : `set the date to ${d.label}`,
+        field: 'date',
+        prevValue: hadDate ? JSON.stringify({ value: before?.date_value, confidence: before?.date_confidence, label: before?.date_label }) : null,
+      });
+    }
   }
 
   if ('location' in body) {
     const loc = body.location == null ? null : String(body.location).trim() || null;
-    await run(db, 'UPDATE photos SET location=?, updated_at=? WHERE id=?', loc, nowIso(), id);
-    await logActivity(db, {
-      memoryId, photoId: id, caller, action: 'set_location',
-      detail: loc ? 'tagged the location' : 'removed the location',
-    });
+    if (loc !== (before?.location ?? null)) {
+      await run(db, 'UPDATE photos SET location=?, updated_at=? WHERE id=?', loc, nowIso(), id);
+      await logActivity(db, {
+        memoryId, photoId: id, caller, action: 'set_location',
+        detail: loc ? 'tagged the location' : 'removed the location',
+        field: 'location', prevValue: before?.location ?? null,
+      });
+    }
   }
 
   if ('about' in body) {
     const about = body.about == null ? null : String(body.about).trim() || null;
-    await run(db, 'UPDATE photos SET about=?, updated_at=? WHERE id=?', about, nowIso(), id);
-    await logActivity(db, {
-      memoryId, photoId: id, caller, action: 'set_about',
-      detail: about ? 'added a story' : 'cleared the story',
-    });
+    if (about !== (before?.about ?? null)) {
+      await run(db, 'UPDATE photos SET about=?, updated_at=? WHERE id=?', about, nowIso(), id);
+      await logActivity(db, {
+        memoryId, photoId: id, caller, action: 'set_about',
+        detail: before?.about ? 'updated the story' : 'added a story',
+        field: 'about', prevValue: before?.about ?? null,
+      });
+    }
   }
 
   if ('notes' in body) {
     const notes = body.notes == null ? null : String(body.notes).trim() || null;
-    await run(db, 'UPDATE photos SET notes=?, updated_at=? WHERE id=?', notes, nowIso(), id);
-    await logActivity(db, { memoryId, photoId: id, caller, action: 'set_notes', detail: 'added a note' });
+    if (notes !== (before?.notes ?? null)) {
+      await run(db, 'UPDATE photos SET notes=?, updated_at=? WHERE id=?', notes, nowIso(), id);
+      await logActivity(db, {
+        memoryId, photoId: id, caller, action: 'set_notes',
+        detail: before?.notes ? 'updated a note' : 'added a note',
+        field: 'notes', prevValue: before?.notes ?? null,
+      });
+    }
   }
 
   if (caller) await touchContributor(db, caller.id);

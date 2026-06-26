@@ -64,6 +64,8 @@ export interface ActivityEntry {
   accent: string;
   action: string;
   detail: string;
+  field?: string | null;       // about | notes | location | date (for restorable history)
+  prevValue?: string | null;   // the value before this change (JSON for date)
   createdAt: string;
 }
 

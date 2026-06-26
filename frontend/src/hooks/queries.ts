@@ -19,6 +19,7 @@ export function useStats(memoryId: number, enabled = true) {
     queryKey: ['stats', memoryId],
     queryFn: () => api.getStats(memoryId),
     enabled: enabled && memoryId > 0,
+    refetchInterval: 8000, // live progress as others contribute (pauses when tab is hidden)
   });
 }
 
@@ -43,11 +44,17 @@ export interface LibraryParams {
 
 const PAGE_SIZE = 30;
 
-export function usePhotosInfinite(memoryId: number, params: LibraryParams, enabled = true) {
+export function usePhotosInfinite(
+  memoryId: number,
+  params: LibraryParams,
+  enabled = true,
+  pollMs: number | false = false,
+) {
   return useInfiniteQuery({
     queryKey: ['photos', memoryId, params],
     initialPageParam: 0,
     enabled: enabled && memoryId > 0,
+    refetchInterval: pollMs,
     queryFn: ({ pageParam }) =>
       api.getPhotos(memoryId, {
         filter: params.filter,
@@ -69,5 +76,6 @@ export function usePhoto(photoId: number) {
     queryKey: ['photo', photoId],
     queryFn: () => api.getPhoto(photoId),
     enabled: photoId > 0,
+    refetchInterval: 5000, // see others' edits within a few seconds (pauses when tab is hidden)
   });
 }
