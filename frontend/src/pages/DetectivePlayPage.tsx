@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { X, Mic, SkipForward } from 'lucide-react';
+import { X, Mic, SkipForward, Check } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useMemory } from '../context/MemoryContext';
 import { usePhotosInfinite, useStats, useSuggestions } from '../hooks/queries';
@@ -15,7 +15,7 @@ import Button from '../components/ui/Button';
 import ProgressBar from '../components/ui/ProgressBar';
 import DateEditor from '../components/editors/DateEditor';
 import ChipSuggestInput from '../components/editors/ChipSuggestInput';
-import type { PhotoDate } from '../lib/types';
+import type { PhotoDate, Person } from '../lib/types';
 
 const CHEERS = [
   'That’s a real gift to the family 💛',
@@ -45,6 +45,7 @@ export default function DetectivePlayPage() {
   // Per-photo drafts
   const [draftDate, setDraftDate] = useState<PhotoDate>({ value: null, confidence: 'unknown', label: null });
   const [draftText, setDraftText] = useState('');
+  const [taggedPeople, setTaggedPeople] = useState<Person[]>([]); // tag several before advancing
   const textRef = useRef<HTMLTextAreaElement>(null);
   const speech = useSpeechRecognition((t) => setDraftText((prev) => (prev ? `${prev} ${t}` : t)));
 
@@ -61,6 +62,7 @@ export default function DetectivePlayPage() {
     setDraftDate({ value: null, confidence: 'unknown', label: null });
     setDraftText('');
     setStoryOpen(false);
+    setTaggedPeople([]);
   }, [current?.id]);
 
   // When we run off the end, load more or finish.
@@ -99,6 +101,29 @@ export default function DetectivePlayPage() {
     try { if (await flushStory()) setCompleted((c) => c + 1); }
     finally { setBusy(false); }
     setIndex((i) => i + 1);
+  };
+
+  // People mission: tag several before advancing. Each tap saves immediately (optimistically).
+  const isTagged = (name: string) => taggedPeople.some((t) => t.name.toLowerCase() === name.toLowerCase());
+  const togglePerson = async (p: Person) => {
+    if (!current) return;
+    if (isTagged(p.name)) {
+      const existing = taggedPeople.find((t) => t.name.toLowerCase() === p.name.toLowerCase())!;
+      setTaggedPeople((prev) => prev.filter((t) => t.id !== existing.id));
+      try { await api.removePerson(current.id, existing.id); } catch { /* will reconcile on reload */ }
+    } else {
+      setTaggedPeople((prev) => [...prev, p]); // optimistic (suggested people carry their real id)
+      try { await api.addPerson(current.id, p.name); } catch { /* ignore */ }
+    }
+  };
+  const addNewPerson = async (name: string) => {
+    if (!current || isTagged(name)) return;
+    try { const person = await api.addPerson(current.id, name); setTaggedPeople((prev) => [...prev, person]); } catch { /* ignore */ }
+  };
+  const removeTagged = async (p: Person) => {
+    if (!current) return;
+    setTaggedPeople((prev) => prev.filter((t) => t.id !== p.id));
+    try { await api.removePerson(current.id, p.id); } catch { /* ignore */ }
   };
 
   if (query.isLoading || (!current && query.hasNextPage)) {
@@ -146,25 +171,44 @@ export default function DetectivePlayPage() {
 
         {mission.key === 'people' && (
           <div>
+            {taggedPeople.length > 0 && (
+              <div className="mb-3 flex flex-wrap gap-2">
+                {taggedPeople.map((p) => (
+                  <span key={p.id} className="flex items-center gap-1.5 rounded-full bg-terracotta py-1.5 pl-2.5 pr-2 text-[15px] font-bold text-white">
+                    {p.name}
+                    <button onClick={() => removeTagged(p)} aria-label={`Remove ${p.name}`} className="text-white/80 hover:text-white">
+                      <X size={15} strokeWidth={2.6} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            <p className="mb-2 text-[14px] font-semibold text-muted">Tap everyone you recognize — there’s often more than one.</p>
             <div className="grid grid-cols-2 gap-2.5">
-              {(suggestions?.people ?? []).slice(0, 8).map((p) => (
-                <button
-                  key={p.id}
-                  disabled={busy}
-                  onClick={() => saveAndNext(async () => { await api.addPerson(current.id, p.name); })}
-                  className="flex items-center gap-2.5 rounded-[16px] border border-line bg-white px-3 py-3 text-left shadow-card transition active:scale-95"
-                >
-                  <Avatar name={p.name} accent={p.accent} size={34} />
-                  <span className="truncate text-[16px] font-bold text-ink">{p.name}</span>
-                </button>
-              ))}
+              {(suggestions?.people ?? []).slice(0, 8).map((p) => {
+                const sel = isTagged(p.name);
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => togglePerson(p)}
+                    className={clsx(
+                      'flex items-center gap-2.5 rounded-[16px] border px-3 py-3 text-left shadow-card transition active:scale-95',
+                      sel ? 'border-terracotta bg-tint' : 'border-line bg-white',
+                    )}
+                  >
+                    <Avatar name={p.name} accent={p.accent} size={34} />
+                    <span className="min-w-0 flex-1 truncate text-[16px] font-bold text-ink">{p.name}</span>
+                    {sel && <Check size={18} strokeWidth={3} className="shrink-0 text-terracotta" />}
+                  </button>
+                );
+              })}
             </div>
             <div className="mt-3">
               <ChipSuggestInput
                 placeholder="Add someone new"
                 suggestions={[]}
-                existing={[]}
-                onAdd={(name) => saveAndNext(async () => { await api.addPerson(current.id, name); })}
+                existing={taggedPeople.map((p) => p.name)}
+                onAdd={(name) => addNewPerson(name)}
               />
             </div>
           </div>
@@ -252,6 +296,11 @@ export default function DetectivePlayPage() {
         {mission.key === 'date' && (
           <Button block disabled={busy || draftDate.confidence === 'unknown'} onClick={() => saveAndNext(async () => { await api.patchPhoto(current.id, { date: draftDate }); })}>
             Save date
+          </Button>
+        )}
+        {mission.key === 'people' && (
+          <Button block disabled={busy || taggedPeople.length === 0} onClick={() => saveAndNext(async () => { /* people already tagged on tap */ })}>
+            Next{taggedPeople.length ? ` · ${taggedPeople.length} tagged` : ''}
           </Button>
         )}
         {mission.key === 'story' && (

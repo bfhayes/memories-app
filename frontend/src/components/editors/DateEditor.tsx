@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { clsx } from 'clsx';
 import { MONTHS, approxPresets, clientDeriveDate } from '../../lib/format';
+import YearWheel from './YearWheel';
 import type { DateConfidence, PhotoDate } from '../../lib/types';
 
 // Ordered easiest → most specific. Year is the obvious first pass; day is last.
@@ -69,27 +70,15 @@ export default function DateEditor({
       <div className="mt-4">
         {mode === 'year' && (
           <div>
-            <input
-              inputMode="numeric"
-              placeholder="Tap to enter a year"
-              value={year}
-              onChange={(e) => setYearVal(e.target.value, 'year')}
-              className={clsx(field, 'text-center text-[24px] font-extrabold tracking-wide')}
-            />
-            <p className="mt-2 text-center text-[14px] text-muted">Even just the year is a big help. Add the month or day later if you remember.</p>
+            <YearWheel value={year ? +year : null} onChange={(y) => setYearVal(String(y), 'year')} />
+            <p className="mt-2 text-center text-[14px] text-muted">Scroll to the year — even just the year is a big help.</p>
           </div>
         )}
 
         {mode === 'month-year' && (
           <div>
-            <input
-              inputMode="numeric"
-              placeholder="Year"
-              value={year}
-              onChange={(e) => setYearVal(e.target.value, 'month-year')}
-              className={clsx(field, 'text-center text-[22px] font-extrabold tracking-wide')}
-            />
-            <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6">
+            <YearWheel value={year ? +year : null} onChange={(y) => setYearVal(String(y), 'month-year')} />
+            <div className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-6">
               {MONTHS.map((mn, i) => {
                 const mv = String(i + 1).padStart(2, '0');
                 const active = month === mv;
