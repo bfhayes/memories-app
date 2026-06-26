@@ -24,24 +24,24 @@ export const onRequestPost = async (context: CFContext): Promise<Response> => {
   if (!name) return jsonNoStore({ error: 'A name is required' }, { status: 400 });
 
   const db = context.env.DB;
-  let person = await first<{ id: number; name: string; accent: string }>(
+  // Upsert without a SELECT-then-INSERT race: INSERT OR IGNORE (no-op if the name already exists,
+  // case-insensitively, thanks to the COLLATE NOCASE unique index) then re-SELECT the canonical
+  // row. This is safe under two concurrent tags of the same new name.
+  await run(
+    db,
+    'INSERT OR IGNORE INTO people (memory_id, name, accent, created_at) VALUES (?, ?, ?, ?)',
+    memoryId,
+    name,
+    pickColor(AVATAR_COLORS, name),
+    nowIso(),
+  );
+  const person = await first<{ id: number; name: string; accent: string }>(
     db,
     'SELECT id, name, accent FROM people WHERE memory_id = ? AND name = ? COLLATE NOCASE',
     memoryId,
     name,
   );
-  if (!person) {
-    const accent = pickColor(AVATAR_COLORS, name);
-    const res = await run(
-      db,
-      'INSERT INTO people (memory_id, name, accent, created_at) VALUES (?, ?, ?, ?)',
-      memoryId,
-      name,
-      accent,
-      nowIso(),
-    );
-    person = { id: Number(res.meta.last_row_id), name, accent };
-  }
+  if (!person) return jsonNoStore({ error: 'Could not tag person' }, { status: 500 });
 
   await run(
     db,

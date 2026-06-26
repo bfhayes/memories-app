@@ -134,54 +134,129 @@ export const onRequestPatch = async (context: CFContext): Promise<Response> => {
     const d = deriveDate(date.value, (date.confidence as DateConfidence) ?? 'unknown', date.label);
     const changed = d.value !== (before?.date_value ?? null) || d.confidence !== (before?.date_confidence ?? 'unknown');
     if (changed) {
-      await run(
+      // Conditional update: only mutate the row if its date is STILL what our snapshot saw. This
+      // makes prev_value the true immediately-prior value even under concurrent edits.
+      const r = await run(
         db,
-        `UPDATE photos SET date_value=?, date_confidence=?, date_label=?, date_sort=?, date_year=?, updated_at=? WHERE id=?`,
-        d.value, d.confidence, d.label, d.sort, d.year, nowIso(), id,
+        `UPDATE photos SET date_value=?, date_confidence=?, date_label=?, date_sort=?, date_year=?, updated_at=?
+          WHERE id=? AND date_value IS ? AND date_confidence IS ?`,
+        d.value, d.confidence, d.label, d.sort, d.year, nowIso(), id, before?.date_value ?? null, before?.date_confidence ?? null,
       );
-      const hadDate = (before?.date_confidence ?? 'unknown') !== 'unknown';
-      await logActivity(db, {
-        memoryId, photoId: id, caller, action: 'set_date',
-        detail: d.confidence === 'unknown' ? 'cleared the date' : `set the date to ${d.label}`,
-        field: 'date',
-        prevValue: hadDate ? JSON.stringify({ value: before?.date_value, confidence: before?.date_confidence, label: before?.date_label }) : null,
-      });
+      let prevValue = before?.date_value ?? null;
+      let prevConfidence = before?.date_confidence ?? 'unknown';
+      let prevLabel = before?.date_label ?? null;
+      let apply = true;
+      if (r.meta.changes === 0) {
+        // Someone changed the date concurrently — re-read the REAL prior value before overwriting.
+        const cur = await first<{ date_value: string | null; date_confidence: string; date_label: string | null }>(
+          db, 'SELECT date_value, date_confidence, date_label FROM photos WHERE id=?', id,
+        );
+        if ((cur?.date_value ?? null) !== d.value || (cur?.date_confidence ?? 'unknown') !== d.confidence) {
+          await run(
+            db,
+            `UPDATE photos SET date_value=?, date_confidence=?, date_label=?, date_sort=?, date_year=?, updated_at=? WHERE id=?`,
+            d.value, d.confidence, d.label, d.sort, d.year, nowIso(), id,
+          );
+          prevValue = cur?.date_value ?? null;
+          prevConfidence = cur?.date_confidence ?? 'unknown';
+          prevLabel = cur?.date_label ?? null;
+        } else {
+          apply = false; // a concurrent write already set our target value
+        }
+      }
+      if (apply) {
+        const hadDate = prevConfidence !== 'unknown';
+        await logActivity(db, {
+          memoryId, photoId: id, caller, action: 'set_date',
+          detail: d.confidence === 'unknown' ? 'cleared the date' : `set the date to ${d.label}`,
+          field: 'date',
+          prevValue: hadDate ? JSON.stringify({ value: prevValue, confidence: prevConfidence, label: prevLabel }) : null,
+        });
+      }
     }
   }
 
   if ('location' in body) {
     const loc = body.location == null ? null : String(body.location).trim() || null;
     if (loc !== (before?.location ?? null)) {
-      await run(db, 'UPDATE photos SET location=?, updated_at=? WHERE id=?', loc, nowIso(), id);
-      await logActivity(db, {
-        memoryId, photoId: id, caller, action: 'set_location',
-        detail: loc ? 'tagged the location' : 'removed the location',
-        field: 'location', prevValue: before?.location ?? null,
-      });
+      const r = await run(
+        db, 'UPDATE photos SET location=?, updated_at=? WHERE id=? AND location IS ?',
+        loc, nowIso(), id, before?.location ?? null,
+      );
+      let prev = before?.location ?? null;
+      let apply = true;
+      if (r.meta.changes === 0) {
+        const cur = await first<{ location: string | null }>(db, 'SELECT location FROM photos WHERE id=?', id);
+        if ((cur?.location ?? null) !== loc) {
+          await run(db, 'UPDATE photos SET location=?, updated_at=? WHERE id=?', loc, nowIso(), id);
+          prev = cur?.location ?? null;
+        } else {
+          apply = false;
+        }
+      }
+      if (apply) {
+        await logActivity(db, {
+          memoryId, photoId: id, caller, action: 'set_location',
+          detail: loc ? 'tagged the location' : 'removed the location',
+          field: 'location', prevValue: prev,
+        });
+      }
     }
   }
 
   if ('about' in body) {
     const about = body.about == null ? null : String(body.about).trim() || null;
     if (about !== (before?.about ?? null)) {
-      await run(db, 'UPDATE photos SET about=?, updated_at=? WHERE id=?', about, nowIso(), id);
-      await logActivity(db, {
-        memoryId, photoId: id, caller, action: 'set_about',
-        detail: before?.about ? 'updated the story' : 'added a story',
-        field: 'about', prevValue: before?.about ?? null,
-      });
+      const r = await run(
+        db, 'UPDATE photos SET about=?, updated_at=? WHERE id=? AND about IS ?',
+        about, nowIso(), id, before?.about ?? null,
+      );
+      let prev = before?.about ?? null;
+      let apply = true;
+      if (r.meta.changes === 0) {
+        const cur = await first<{ about: string | null }>(db, 'SELECT about FROM photos WHERE id=?', id);
+        if ((cur?.about ?? null) !== about) {
+          await run(db, 'UPDATE photos SET about=?, updated_at=? WHERE id=?', about, nowIso(), id);
+          prev = cur?.about ?? null;
+        } else {
+          apply = false;
+        }
+      }
+      if (apply) {
+        await logActivity(db, {
+          memoryId, photoId: id, caller, action: 'set_about',
+          detail: prev ? 'updated the story' : 'added a story',
+          field: 'about', prevValue: prev,
+        });
+      }
     }
   }
 
   if ('notes' in body) {
     const notes = body.notes == null ? null : String(body.notes).trim() || null;
     if (notes !== (before?.notes ?? null)) {
-      await run(db, 'UPDATE photos SET notes=?, updated_at=? WHERE id=?', notes, nowIso(), id);
-      await logActivity(db, {
-        memoryId, photoId: id, caller, action: 'set_notes',
-        detail: before?.notes ? 'updated a note' : 'added a note',
-        field: 'notes', prevValue: before?.notes ?? null,
-      });
+      const r = await run(
+        db, 'UPDATE photos SET notes=?, updated_at=? WHERE id=? AND notes IS ?',
+        notes, nowIso(), id, before?.notes ?? null,
+      );
+      let prev = before?.notes ?? null;
+      let apply = true;
+      if (r.meta.changes === 0) {
+        const cur = await first<{ notes: string | null }>(db, 'SELECT notes FROM photos WHERE id=?', id);
+        if ((cur?.notes ?? null) !== notes) {
+          await run(db, 'UPDATE photos SET notes=?, updated_at=? WHERE id=?', notes, nowIso(), id);
+          prev = cur?.notes ?? null;
+        } else {
+          apply = false;
+        }
+      }
+      if (apply) {
+        await logActivity(db, {
+          memoryId, photoId: id, caller, action: 'set_notes',
+          detail: prev ? 'updated a note' : 'added a note',
+          field: 'notes', prevValue: prev,
+        });
+      }
     }
   }
 
@@ -190,20 +265,20 @@ export const onRequestPatch = async (context: CFContext): Promise<Response> => {
   return jsonNoStore(full);
 };
 
-// DELETE /api/photos/:id — remove a photo (and its R2 objects).
+// DELETE /api/photos/:id — soft delete (set `deleted_at`). The R2 objects are kept so the
+// photo can be restored via POST /api/photos/:id/restore.
 export const onRequestDelete = async (context: CFContext): Promise<Response> => {
   const id = parseInt(context.params.id as string, 10);
   if (isNaN(id)) return jsonNoStore({ error: 'Invalid id' }, { status: 400 });
-  const row = await first<{ memory_id: number; r2_key: string; thumb_key: string }>(
-    context.env.DB,
-    'SELECT memory_id, r2_key, thumb_key FROM photos WHERE id = ?',
-    id,
-  );
-  if (!row) return jsonNoStore({ error: 'Not found' }, { status: 404 });
-  const denied = requireMemoryAccess(context, row.memory_id);
+  const memoryId = await loadMemoryId(context.env.DB, id);
+  if (memoryId === null) return jsonNoStore({ error: 'Not found' }, { status: 404 });
+  const denied = requireMemoryAccess(context, memoryId);
   if (denied) return denied;
 
-  await context.env.IMAGES.delete([row.r2_key, row.thumb_key]).catch(() => {});
-  await run(context.env.DB, 'DELETE FROM photos WHERE id = ?', id);
+  const db = context.env.DB;
+  await run(db, 'UPDATE photos SET deleted_at=?, updated_at=? WHERE id=?', nowIso(), nowIso(), id);
+
+  const caller = await getCaller(context, memoryId);
+  await logActivity(db, { memoryId, photoId: id, caller, action: 'deleted', detail: 'removed this photo' });
   return jsonNoStore({ ok: true, id });
 };

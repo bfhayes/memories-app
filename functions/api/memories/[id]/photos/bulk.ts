@@ -41,18 +41,49 @@ export const onRequestPatch = async (context: CFContext): Promise<Response> => {
   if (body.date && typeof body.date === 'object') {
     const date = body.date as { value?: string; confidence?: string; label?: string };
     const d = deriveDate(date.value, (date.confidence as DateConfidence) ?? 'unknown', date.label);
+    // Capture each photo's prior date BEFORE overwriting so the change is restorable per photo.
+    const prior = await all<{ id: number; date_value: string | null; date_confidence: string; date_label: string | null }>(
+      db,
+      `SELECT id, date_value, date_confidence, date_label FROM photos WHERE id IN (${ph})`,
+      ...photoIds,
+    );
     await run(
       db,
       `UPDATE photos SET date_value=?, date_confidence=?, date_label=?, date_sort=?, date_year=?, updated_at=?
         WHERE id IN (${ph})`,
       d.value, d.confidence, d.label, d.sort, d.year, ts, ...photoIds,
     );
+    for (const p of prior) {
+      const changedThis = (p.date_value ?? null) !== d.value || (p.date_confidence ?? 'unknown') !== d.confidence;
+      if (!changedThis) continue;
+      const hadDate = (p.date_confidence ?? 'unknown') !== 'unknown';
+      await logActivity(db, {
+        memoryId: id, photoId: p.id, caller, action: 'set_date',
+        detail: d.confidence === 'unknown' ? 'cleared the date' : `set the date to ${d.label}`,
+        field: 'date',
+        prevValue: hadDate ? JSON.stringify({ value: p.date_value, confidence: p.date_confidence, label: p.date_label }) : null,
+      });
+    }
     if (d.label) applied.push(`date “${d.label}”`);
   }
 
   if (typeof body.location === 'string' && body.location.trim()) {
     const loc = body.location.trim();
+    // Capture each photo's prior location BEFORE overwriting so the change is restorable per photo.
+    const prior = await all<{ id: number; location: string | null }>(
+      db,
+      `SELECT id, location FROM photos WHERE id IN (${ph})`,
+      ...photoIds,
+    );
     await run(db, `UPDATE photos SET location=?, updated_at=? WHERE id IN (${ph})`, loc, ts, ...photoIds);
+    for (const p of prior) {
+      if ((p.location ?? null) === loc) continue;
+      await logActivity(db, {
+        memoryId: id, photoId: p.id, caller, action: 'set_location',
+        detail: 'tagged the location',
+        field: 'location', prevValue: p.location ?? null,
+      });
+    }
     applied.push(`location “${loc}”`);
   }
 
@@ -60,20 +91,20 @@ export const onRequestPatch = async (context: CFContext): Promise<Response> => {
     ? body.addPeople.map((s) => String(s).trim()).filter(Boolean)
     : [];
   for (const name of addPeople) {
-    let person = await first<{ id: number }>(
+    // Upsert without a SELECT-then-INSERT race (handles two concurrent bulk edits adding the same
+    // new name): INSERT OR IGNORE then re-SELECT the canonical row via the COLLATE NOCASE index.
+    await run(
+      db,
+      'INSERT OR IGNORE INTO people (memory_id, name, accent, created_at) VALUES (?, ?, ?, ?)',
+      id, name, pickColor(AVATAR_COLORS, name), ts,
+    );
+    const person = await first<{ id: number }>(
       db,
       'SELECT id FROM people WHERE memory_id = ? AND name = ? COLLATE NOCASE',
       id,
       name,
     );
-    if (!person) {
-      const res = await run(
-        db,
-        'INSERT INTO people (memory_id, name, accent, created_at) VALUES (?, ?, ?, ?)',
-        id, name, pickColor(AVATAR_COLORS, name), ts,
-      );
-      person = { id: Number(res.meta.last_row_id) };
-    }
+    if (!person) continue;
     for (const pid of photoIds) {
       await run(
         db,

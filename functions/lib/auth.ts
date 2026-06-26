@@ -32,7 +32,7 @@ export async function readUnlocked(request: Request, secret: string): Promise<nu
   const token = parseCookie(request.headers.get('Cookie'), COOKIE);
   if (!token) return [];
   try {
-    const { payload } = await jwtVerify(token, secretKey(secret));
+    const { payload } = await jwtVerify(token, secretKey(secret), { algorithms: ['HS256'] });
     const mem = payload.mem;
     return Array.isArray(mem) ? mem.filter((n): n is number => typeof n === 'number') : [];
   } catch {

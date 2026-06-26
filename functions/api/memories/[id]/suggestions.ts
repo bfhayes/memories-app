@@ -23,14 +23,14 @@ export const onRequestGet = async (context: CFContext): Promise<Response> => {
   const locations = await all<{ location: string }>(
     db,
     `SELECT location FROM photos
-      WHERE memory_id = ? AND location IS NOT NULL AND location != ''
+      WHERE memory_id = ? AND location IS NOT NULL AND location != '' AND deleted_at IS NULL
       GROUP BY location ORDER BY COUNT(*) DESC, location ASC`,
     id,
   );
   const tags = await all<{ tag: string }>(
     db,
     `SELECT pt.tag FROM photo_tags pt JOIN photos p ON p.id = pt.photo_id
-      WHERE p.memory_id = ?
+      WHERE p.memory_id = ? AND p.deleted_at IS NULL
       GROUP BY pt.tag ORDER BY COUNT(*) DESC, pt.tag ASC`,
     id,
   );

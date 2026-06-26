@@ -47,7 +47,7 @@ export const onRequestPost = async (context: CFContext): Promise<Response> => {
   const password = String(body.password ?? '').trim();
   const yearLabel = body.yearLabel ? String(body.yearLabel).trim() : null;
   if (!name) return jsonNoStore({ error: 'A name is required' }, { status: 400 });
-  if (password.length < 4) return jsonNoStore({ error: 'Password must be at least 4 characters' }, { status: 400 });
+  if (password.length < 6) return jsonNoStore({ error: 'Password must be at least 6 characters' }, { status: 400 });
 
   const tone = typeof body.coverTone === 'string' && body.coverTone
     ? body.coverTone

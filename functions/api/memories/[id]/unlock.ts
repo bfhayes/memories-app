@@ -1,7 +1,10 @@
-import { first } from '../../../lib/db';
+import { first, run, nowIso } from '../../../lib/db';
 import { parseJsonBody, jsonNoStore } from '../../../lib/request';
 import { verifyPassword, accessCookie, isSecure } from '../../../lib/auth';
 import type { CFContext } from '../../../lib/env';
+
+const MAX_ATTEMPTS = 8;
+const WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 
 // POST /api/memories/:id/unlock — check the shared password; on success set the access cookie.
 export const onRequestPost = async (context: CFContext): Promise<Response> => {
@@ -19,8 +22,49 @@ export const onRequestPost = async (context: CFContext): Promise<Response> => {
   );
   if (!m) return jsonNoStore({ error: 'Not found' }, { status: 404 });
 
+  const ip = context.request.headers.get('CF-Connecting-IP') || 'unknown';
+  const cutoff = new Date(Date.now() - WINDOW_MS).toISOString();
+
+  // Opportunistically clear stale attempts, then count what remains in the window.
+  await run(
+    context.env.DB,
+    'DELETE FROM unlock_attempts WHERE memory_id = ? AND ip = ? AND created_at < ?',
+    id,
+    ip,
+    cutoff,
+  );
+  const counted = await first<{ n: number }>(
+    context.env.DB,
+    'SELECT COUNT(*) AS n FROM unlock_attempts WHERE memory_id = ? AND ip = ?',
+    id,
+    ip,
+  );
+  if ((counted?.n ?? 0) >= MAX_ATTEMPTS) {
+    return jsonNoStore(
+      { error: 'Too many tries — please wait a few minutes and try again.' },
+      { status: 429, headers: { 'Retry-After': '900' } },
+    );
+  }
+
   const ok = await verifyPassword(password, m.password_hash, context.env.AUTH_SECRET);
-  if (!ok) return jsonNoStore({ error: 'That password doesn’t match' }, { status: 401 });
+  if (!ok) {
+    await run(
+      context.env.DB,
+      'INSERT INTO unlock_attempts (memory_id, ip, created_at) VALUES (?, ?, ?)',
+      id,
+      ip,
+      nowIso(),
+    );
+    return jsonNoStore({ error: 'That password doesn’t match' }, { status: 401 });
+  }
+
+  // Correct password — clear any recorded attempts for this (memory, ip).
+  await run(
+    context.env.DB,
+    'DELETE FROM unlock_attempts WHERE memory_id = ? AND ip = ?',
+    id,
+    ip,
+  );
 
   const cookie = await accessCookie([...context.data.unlockedMemories, id], context.env.AUTH_SECRET, isSecure(context.request));
   return jsonNoStore({ ok: true }, { headers: { 'Set-Cookie': cookie } });

@@ -13,10 +13,7 @@ export const onRequest = [
       return response;
     } catch (err) {
       console.error(`✗ ${url.pathname} ERROR (${Date.now() - start}ms):`, err);
-      return Response.json(
-        { error: 'Internal server error', detail: err instanceof Error ? err.message : String(err) },
-        { status: 500 },
-      );
+      return Response.json({ error: 'Internal server error' }, { status: 500 });
     }
   },
   // Access middleware — reads the signed cookie into unlockedMemories. Never blocks.

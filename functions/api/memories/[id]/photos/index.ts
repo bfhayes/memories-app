@@ -75,7 +75,7 @@ export const onRequestGet = async (context: CFContext): Promise<Response> => {
   const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '30', 10) || 30, 100);
   const offset = Math.max(parseInt(url.searchParams.get('offset') ?? '0', 10) || 0, 0);
 
-  const where: string[] = ['p.memory_id = ?'];
+  const where: string[] = ['p.memory_id = ?', 'p.deleted_at IS NULL'];
   const args: unknown[] = [id];
 
   const noPeople = `NOT EXISTS (SELECT 1 FROM photo_people pp WHERE pp.photo_id = p.id)`;
@@ -194,6 +194,15 @@ export const onRequestPost = async (context: CFContext): Promise<Response> => {
   let meta: Record<string, unknown> = {};
   try { meta = JSON.parse(String(form.get('meta') ?? '{}')); } catch { /* tolerate */ }
 
+  // Validate the upload before reading bytes. Empty type is allowed — some browsers omit it.
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif', 'image/tiff', 'image/avif'];
+  if (original.type && !allowedTypes.includes(original.type)) {
+    return jsonNoStore({ error: "That file type isn't supported — please upload a photo." }, { status: 400 });
+  }
+  if (original.size > 30 * 1024 * 1024) {
+    return jsonNoStore({ error: 'That photo is too large.' }, { status: 413 });
+  }
+
   const origBuf = await original.arrayBuffer();
   const digest = await crypto.subtle.digest('SHA-256', origBuf);
   const hash = [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
@@ -217,11 +226,6 @@ export const onRequestPost = async (context: CFContext): Promise<Response> => {
   const thumbKey = `${id}/${uuid}/thumb.jpg`;
   const contentType = original.type || 'image/jpeg';
 
-  await context.env.IMAGES.put(origKey, origBuf, { httpMetadata: { contentType } });
-  await context.env.IMAGES.put(thumbKey, await thumb.arrayBuffer(), {
-    httpMetadata: { contentType: 'image/jpeg' },
-  });
-
   const width = Number(meta.width) || null;
   const height = Number(meta.height) || null;
   const tone = typeof meta.tone === 'string' && meta.tone ? meta.tone : pickColor(PHOTO_TONES, uuid);
@@ -231,33 +235,68 @@ export const onRequestPost = async (context: CFContext): Promise<Response> => {
   const d = deriveDate(null, 'unknown');
 
   const ts = nowIso();
-  const res = await run(
-    context.env.DB,
-    `INSERT INTO photos
-       (memory_id, r2_key, thumb_key, content_hash, file_name, file_size, content_type,
-        width, height, tone, date_value, date_confidence, date_label, date_sort, date_year,
-        source, uploaded_by, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    id,
-    origKey,
-    thumbKey,
-    hash,
-    original.name || (meta.fileName as string) || null,
-    original.size || null,
-    contentType,
-    width,
-    height,
-    tone,
-    d.value,
-    d.confidence,
-    d.label,
-    d.sort,
-    d.year,
-    'Upload',
-    caller?.id ?? null,
-    ts,
-    ts,
-  );
+  let res: D1Result;
+  // Write the R2 objects and the row together. If anything throws, clean up the just-written
+  // R2 objects before rethrowing so a failure never leaves orphans behind.
+  try {
+    await context.env.IMAGES.put(origKey, origBuf, { httpMetadata: { contentType } });
+    await context.env.IMAGES.put(thumbKey, await thumb.arrayBuffer(), {
+      httpMetadata: { contentType: 'image/jpeg' },
+    });
+
+    // ON CONFLICT DO NOTHING handles the race where two identical uploads both pass the dup
+    // SELECT above — the unique index (memory_id, content_hash) lets only one win.
+    res = await run(
+      context.env.DB,
+      `INSERT INTO photos
+         (memory_id, r2_key, thumb_key, content_hash, file_name, file_size, content_type,
+          width, height, tone, date_value, date_confidence, date_label, date_sort, date_year,
+          source, uploaded_by, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(memory_id, content_hash) DO NOTHING`,
+      id,
+      origKey,
+      thumbKey,
+      hash,
+      original.name || (meta.fileName as string) || null,
+      original.size || null,
+      contentType,
+      width,
+      height,
+      tone,
+      d.value,
+      d.confidence,
+      d.label,
+      d.sort,
+      d.year,
+      'Upload',
+      caller?.id ?? null,
+      ts,
+      ts,
+    );
+  } catch (err) {
+    await context.env.IMAGES.delete([origKey, thumbKey]);
+    throw err;
+  }
+
+  // A concurrent identical upload won the race — our INSERT was a no-op. Drop the R2 objects we
+  // just wrote (the winner has its own keys) and report the existing photo as a duplicate.
+  if (res.meta.changes === 0) {
+    await context.env.IMAGES.delete([origKey, thumbKey]);
+    const existing = await first<PhotoRow>(
+      context.env.DB,
+      `SELECT p.id, p.thumb_key, p.tone, p.width, p.height, p.date_label, p.date_confidence,
+              p.location, p.about, p.notes, p.created_at, p.updated_at,
+              (SELECT COUNT(*) FROM photo_people pp WHERE pp.photo_id = p.id) AS people_count,
+              (SELECT COUNT(*) FROM photo_tags pt WHERE pt.photo_id = p.id) AS tag_count,
+              (SELECT COUNT(*) FROM photo_likes pl WHERE pl.photo_id = p.id) AS like_count, 0 AS liked_by_me
+         FROM photos p WHERE p.memory_id = ? AND p.content_hash = ?`,
+      id,
+      hash,
+    );
+    return jsonNoStore({ duplicate: true, photo: summarize(existing!) }, { status: 200 });
+  }
+
   const photoId = Number(res.meta.last_row_id);
 
   await logActivity(context.env.DB, {

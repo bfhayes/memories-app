@@ -47,7 +47,7 @@ export const onRequestGet = async (context: CFContext): Promise<Response> => {
        SUM(CASE WHEN (${hasDate}) AND (${hasPeople}) AND (${hasStory}) AND (${hasLoc}) THEN 0 ELSE 1 END) AS needs_info,
        SUM((CASE WHEN ${hasDate} THEN 1 ELSE 0 END) + (CASE WHEN ${hasPeople} THEN 1 ELSE 0 END)
          + (CASE WHEN ${hasStory} THEN 1 ELSE 0 END) + (CASE WHEN ${hasLoc} THEN 1 ELSE 0 END)) AS filled_fields
-     FROM photos p WHERE p.memory_id = ?`,
+     FROM photos p WHERE p.memory_id = ? AND p.deleted_at IS NULL`,
     callerId,
     id,
   );
@@ -55,7 +55,7 @@ export const onRequestGet = async (context: CFContext): Promise<Response> => {
   const decades = await all<{ decade: number; count: number }>(
     db,
     `SELECT (date_year / 10) * 10 AS decade, COUNT(*) AS count
-       FROM photos WHERE memory_id = ? AND date_year IS NOT NULL
+       FROM photos WHERE memory_id = ? AND date_year IS NOT NULL AND deleted_at IS NULL
       GROUP BY decade ORDER BY decade ASC`,
     id,
   );
