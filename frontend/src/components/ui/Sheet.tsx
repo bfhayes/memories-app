@@ -36,7 +36,7 @@ export default function Sheet({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center sm:items-center animate-fade-in"
+      className="fixed inset-x-0 top-0 z-50 flex h-[100dvh] items-end justify-center p-0 sm:items-center sm:p-4 animate-fade-in"
       style={{ background: 'rgba(40,30,20,0.34)' }}
       onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
@@ -45,7 +45,7 @@ export default function Sheet({
         aria-modal="true"
         className={clsx(
           'w-full sm:max-w-[460px] bg-page rounded-t-[26px] sm:rounded-[26px] shadow-pop',
-          'max-h-[92vh] sm:max-h-[86vh] flex flex-col animate-sheet-up sm:animate-scale-in',
+          'max-h-[92dvh] sm:max-h-[86dvh] flex flex-col animate-sheet-up sm:animate-scale-in',
           className,
         )}
       >
@@ -65,7 +65,7 @@ export default function Sheet({
           )}
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto px-5 sm:px-6 py-3">{children}</div>
-        {footer && <div className="shrink-0 px-5 sm:px-6 pt-3 pb-5 safe-bottom border-t border-line-divider">{footer}</div>}
+        {footer && <div className="shrink-0 px-5 sm:px-6 pt-3 pb-6 safe-bottom border-t border-line-divider">{footer}</div>}
       </div>
     </div>
   );
