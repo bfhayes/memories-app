@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 
 const ITEM_H = 44;
 const VISIBLE = 5; // odd — number of rows shown
@@ -62,6 +63,9 @@ export default function YearWheel({
         className="pointer-events-none absolute inset-x-2 top-1/2 -translate-y-1/2 rounded-[14px] border-2"
         style={{ height: ITEM_H, borderColor: 'var(--color-terracotta-border)', background: 'var(--color-tint)' }}
       />
+      {/* scroll hints — make it obvious the wheel turns */}
+      <ChevronUp className="pointer-events-none absolute left-1/2 top-0.5 -translate-x-1/2 text-chevron" size={20} />
+      <ChevronDown className="pointer-events-none absolute bottom-0.5 left-1/2 -translate-x-1/2 text-chevron" size={20} />
       <div
         ref={ref}
         onScroll={onScroll}

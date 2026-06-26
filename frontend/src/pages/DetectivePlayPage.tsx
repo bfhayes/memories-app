@@ -134,7 +134,7 @@ export default function DetectivePlayPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-[100dvh] max-w-xl flex-col px-5 pt-4 safe-top sm:px-6">
+    <div className="mx-auto min-h-[100dvh] max-w-xl px-5 pt-4 pb-12 safe-top sm:px-6">
       {/* Header + progress */}
       <div className="flex items-center gap-3">
         <button onClick={() => navigate(`/m/${memoryId}/detective`)} aria-label="Close" className="grid h-10 w-10 place-items-center rounded-full bg-chip text-muted hover:text-ink active:scale-95">
@@ -157,14 +157,14 @@ export default function DetectivePlayPage() {
           contain
           loading="eager"
           className="w-full rounded-[22px] shadow-feature"
-          style={{ aspectRatio: current.width && current.height ? `${current.width} / ${current.height}` : '4 / 3', maxHeight: '42vh' }}
+          style={{ aspectRatio: current.width && current.height ? `${current.width} / ${current.height}` : '4 / 3', maxHeight: '30vh' }}
         />
       </div>
 
       <h2 className="mt-5 text-center text-[24px] font-extrabold tracking-[-0.01em] text-ink">{mission.prompt}</h2>
 
       {/* Mission editor */}
-      <div className="mt-4 flex-1">
+      <div className="mt-4">
         {mission.key === 'date' && (
           <DateEditor value={draftDate} onChange={setDraftDate} />
         )}
@@ -291,8 +291,8 @@ export default function DetectivePlayPage() {
         <div className="mb-2 rounded-full bg-sage-tint px-4 py-2 text-center text-[14px] font-bold text-sage-dark">{cheer}</div>
       )}
 
-      {/* Actions */}
-      <div className="sticky bottom-0 flex flex-col gap-2.5 bg-page/90 py-3 backdrop-blur safe-bottom">
+      {/* Actions — in normal flow (below the editor), so they never cover the wheel/inputs. */}
+      <div className="mt-6 flex flex-col gap-2.5 pb-4 safe-bottom">
         {mission.key === 'date' && (
           <Button block disabled={busy || draftDate.confidence === 'unknown'} onClick={() => saveAndNext(async () => { await api.patchPhoto(current.id, { date: draftDate }); })}>
             Save date
