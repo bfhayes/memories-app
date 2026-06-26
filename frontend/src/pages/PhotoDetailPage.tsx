@@ -215,15 +215,6 @@ export default function PhotoDetailPage() {
             />
           </MetaCard>
 
-          {/* NOTES */}
-          <MetaCard label="Notes" glyph="🗒️">
-            <AutoTextarea
-              value={photo.notes ?? ''}
-              placeholder="Anything else worth jotting down (optional)…"
-              onSave={(v) => v !== (photo.notes ?? '') && editor.setNotes(v)}
-            />
-          </MetaCard>
-
           {/* PHOTO DETAILS */}
           <MetaCard label="Photo details">
             <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-[15px]">
