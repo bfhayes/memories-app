@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { useQueryClient, type InfiniteData } from '@tanstack/react-query';
 import { api } from '../api/client';
 import type { PhotoDetail, PhotoPage } from '../lib/types';
@@ -9,8 +9,12 @@ import type { PhotoDetail, PhotoPage } from '../lib/types';
  */
 export function useLike(memoryId: number) {
   const qc = useQueryClient();
+  const pendingRef = useRef<Set<number>>(new Set());
 
   return useCallback(async (photoId: number, currentlyLiked: boolean) => {
+    // Prevent rapid like→unlike races from landing out of order: ignore a toggle while one is in flight.
+    if (pendingRef.current.has(photoId)) return;
+
     const next = !currentlyLiked;
     const delta = next ? 1 : -1;
 
@@ -34,6 +38,11 @@ export function useLike(memoryId: number) {
       );
     };
 
+    pendingRef.current.add(photoId);
+    // Cancel in-flight polls so a stale list/detail fetch can't overwrite the optimistic toggle.
+    await qc.cancelQueries({ queryKey: ['photos', memoryId] });
+    await qc.cancelQueries({ queryKey: ['photo', photoId] });
+
     applyLists(null, next); // optimistic
     try {
       const res = next ? await api.likePhoto(photoId) : await api.unlikePhoto(photoId);
@@ -42,6 +51,8 @@ export function useLike(memoryId: number) {
     } catch {
       qc.invalidateQueries({ queryKey: ['photos', memoryId] });
       qc.invalidateQueries({ queryKey: ['photo', photoId] });
+    } finally {
+      pendingRef.current.delete(photoId);
     }
   }, [qc, memoryId]);
 }

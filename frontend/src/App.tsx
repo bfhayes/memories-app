@@ -12,6 +12,8 @@ import DetectiveHomePage from './pages/DetectiveHomePage';
 import DetectivePlayPage from './pages/DetectivePlayPage';
 import DetectiveDonePage from './pages/DetectiveDonePage';
 import NotFoundPage from './pages/NotFoundPage';
+import CreateMemoryPage from './pages/CreateMemoryPage';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function FullLoader() {
   return (
@@ -44,20 +46,21 @@ function MemoryShell() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<HubPage />} />
-      {/* "Create a memory" is temporarily disabled — the page stays in the codebase. */}
-      <Route path="/new" element={<Navigate to="/" replace />} />
-      <Route path="/m/:memoryId" element={<MemoryShell />}>
-        <Route index element={<HomePage />} />
-        <Route path="upload" element={<UploadPage />} />
-        <Route path="library" element={<LibraryPage />} />
-        <Route path="photo/:photoId" element={<PhotoDetailPage />} />
-        <Route path="detective" element={<DetectiveHomePage />} />
-        <Route path="detective/done" element={<DetectiveDonePage />} />
-        <Route path="detective/:mission" element={<DetectivePlayPage />} />
-      </Route>
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+    <ErrorBoundary>
+      <Routes>
+        <Route path="/" element={<HubPage />} />
+        <Route path="/new" element={<CreateMemoryPage />} />
+        <Route path="/m/:memoryId" element={<MemoryShell />}>
+          <Route index element={<HomePage />} />
+          <Route path="upload" element={<UploadPage />} />
+          <Route path="library" element={<LibraryPage />} />
+          <Route path="photo/:photoId" element={<PhotoDetailPage />} />
+          <Route path="detective" element={<DetectiveHomePage />} />
+          <Route path="detective/done" element={<DetectiveDonePage />} />
+          <Route path="detective/:mission" element={<DetectivePlayPage />} />
+        </Route>
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </ErrorBoundary>
   );
 }

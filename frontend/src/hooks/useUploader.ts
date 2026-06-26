@@ -151,6 +151,14 @@ export function useUploader(memoryId: number, contributorId: number | null) {
     commit();
   }, [commit]);
 
+  const retry = useCallback((id: string) => {
+    const it = itemsRef.current.find((x) => x.id === id);
+    if (!it || it.status !== 'error') return;
+    removedRef.current.delete(id); // re-allow writes if it was previously removed
+    patch(id, { status: 'queued', progress: 0, error: undefined });
+    pump();
+  }, [patch, pump]);
+
   const reset = useCallback(() => {
     itemsRef.current.forEach((it) => { removedRef.current.add(it.id); xhrsRef.current.get(it.id)?.abort(); URL.revokeObjectURL(it.preview); });
     itemsRef.current = [];
@@ -172,7 +180,7 @@ export function useUploader(memoryId: number, contributorId: number | null) {
     : items.reduce((s, i) => s + (isFinal(i.status) ? 1 : i.progress), 0) / total;
 
   return {
-    items, addFiles, removeItem, reset,
+    items, addFiles, removeItem, reset, retry,
     total, finished, succeeded, duplicates, failed, inFlight, overall,
   };
 }

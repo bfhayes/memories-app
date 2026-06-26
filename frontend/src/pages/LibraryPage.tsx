@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Search, SlidersHorizontal, CheckSquare, ImagePlus, X, ArrowUpDown } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useMemory } from '../context/MemoryContext';
-import { usePhotosInfinite, useStats, useSuggestions } from '../hooks/queries';
+import { useContributors, usePhotosInfinite, useStats, useSuggestions } from '../hooks/queries';
 import { useLike } from '../hooks/useLike';
 import { useDebouncedCallback } from '../hooks/useDebouncedCallback';
 import { decadeLabel } from '../lib/format';
@@ -50,6 +50,7 @@ export default function LibraryPage() {
 
   const { data: stats } = useStats(memoryId);
   const { data: suggestions } = useSuggestions(memoryId);
+  const { data: contributors } = useContributors(memoryId);
   const toggleLike = useLike(memoryId);
   const query = usePhotosInfinite(
     memoryId,
@@ -59,6 +60,8 @@ export default function LibraryPage() {
       q: qDebounced || undefined,
       decade: filters.decade,
       person: filters.person,
+      tag: filters.tag,
+      contributor: filters.contributor,
     },
     true,
     selectMode ? false : 10000, // live-refresh the grid, but hold still while multi-selecting
@@ -78,7 +81,9 @@ export default function LibraryPage() {
   const exitSelect = () => { setSelectMode(false); setSelected(new Set()); };
 
   const personName = suggestions?.people.find((p) => p.id === filters.person)?.name;
-  const activeExtras = (filters.decade ? 1 : 0) + (filters.person ? 1 : 0);
+  const contributorName = contributors?.find((c) => c.id === filters.contributor)?.name;
+  const activeExtras =
+    (filters.decade ? 1 : 0) + (filters.person ? 1 : 0) + (filters.tag ? 1 : 0) + (filters.contributor ? 1 : 0);
 
   const searchBar = (
     <div className="relative">
@@ -109,7 +114,7 @@ export default function LibraryPage() {
             filters.filter === 'all' && !qDebounced ? (
               <Link to={`/m/${memoryId}/upload`}><Button block><ImagePlus size={20} /> Upload photos</Button></Link>
             ) : (
-              <Button block variant="outline" onClick={() => { patch({ filter: 'all', decade: undefined, person: undefined }); setQ(''); }}>
+              <Button block variant="outline" onClick={() => { patch({ filter: 'all', decade: undefined, person: undefined, tag: undefined, contributor: undefined }); setQ(''); }}>
                 Clear filters
               </Button>
             )
@@ -246,8 +251,8 @@ export default function LibraryPage() {
             </div>
           </div>
 
-          {/* Active filter summary (decade / person) */}
-          {(filters.decade || filters.person) && (
+          {/* Active filter summary (decade / person / tag / contributor) */}
+          {(filters.decade || filters.person || filters.tag || filters.contributor) && (
             <div className="mb-3 mt-3 flex flex-wrap gap-2 lg:mt-0">
               {filters.decade && (
                 <button onClick={() => patch({ decade: undefined })} className="flex items-center gap-1.5 rounded-full bg-chip px-3 py-1.5 text-[14px] font-bold text-body">
@@ -257,6 +262,16 @@ export default function LibraryPage() {
               {filters.person && personName && (
                 <button onClick={() => patch({ person: undefined })} className="flex items-center gap-1.5 rounded-full bg-chip px-3 py-1.5 text-[14px] font-bold text-body">
                   {personName} <X size={14} />
+                </button>
+              )}
+              {filters.tag && (
+                <button onClick={() => patch({ tag: undefined })} className="flex items-center gap-1.5 rounded-full bg-chip px-3 py-1.5 text-[14px] font-bold text-body">
+                  {filters.tag} <X size={14} />
+                </button>
+              )}
+              {filters.contributor && contributorName && (
+                <button onClick={() => patch({ contributor: undefined })} className="flex items-center gap-1.5 rounded-full bg-chip px-3 py-1.5 text-[14px] font-bold text-body">
+                  {contributorName} <X size={14} />
                 </button>
               )}
             </div>
@@ -292,6 +307,8 @@ export default function LibraryPage() {
         onChange={patch}
         stats={stats}
         people={suggestions?.people ?? []}
+        tags={suggestions?.tags ?? []}
+        contributors={contributors ?? []}
       />
       <BulkEditSheet
         open={bulkOpen}

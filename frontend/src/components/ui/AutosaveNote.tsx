@@ -31,7 +31,7 @@ export default function AutosaveNote({
           <Loader2 size={15} className="animate-spin-slow" /> Saving…
         </span>
       ) : (
-        <span className={clsx('flex items-center gap-1.5 transition-colors', justSaved ? 'text-sage' : 'text-faint')}>
+        <span className={clsx('flex items-center gap-1.5 transition-colors', justSaved ? 'text-sage' : 'text-muted')}>
           <Check size={15} strokeWidth={3} /> {justSaved ? 'Saved' : 'Changes save automatically'}
         </span>
       )}

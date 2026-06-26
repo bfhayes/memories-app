@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ChevronLeft, Check, ImagePlus } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -15,9 +15,26 @@ export default function UploadPage() {
   const [dragOver, setDragOver] = useState(false);
   const up = useUploader(memoryId, identity?.id ?? null);
 
+  // Warn on tab close/refresh while uploads are still in flight.
+  useEffect(() => {
+    if (!up.inFlight) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [up.inFlight]);
+
   if (!memory) return null;
 
   const pick = () => inputRef.current?.click();
+
+  // Confirm before navigating away while uploads are still in flight.
+  const leaveTo = (to: string) => {
+    if (up.inFlight && !window.confirm('Photos are still uploading — leave anyway? Unfinished ones won’t be saved.')) return;
+    navigate(to);
+  };
   const allDone = up.total > 0 && !up.inFlight;
   const pct = Math.round(up.overall * 100);
 
@@ -33,7 +50,15 @@ export default function UploadPage() {
       />
 
       <header className="flex items-center gap-2 px-5 pt-4 pb-2 safe-top sm:px-6">
-        <Link to={`/m/${memoryId}`} className="flex items-center gap-1 text-[16px] font-bold text-muted hover:text-ink">
+        <Link
+          to={`/m/${memoryId}`}
+          onClick={(e) => {
+            if (up.inFlight && !window.confirm('Photos are still uploading — leave anyway? Unfinished ones won’t be saved.')) {
+              e.preventDefault();
+            }
+          }}
+          className="flex items-center gap-1 text-[16px] font-bold text-muted hover:text-ink"
+        >
           <ChevronLeft size={20} /> {up.inFlight ? 'Uploading' : 'Back'}
         </Link>
       </header>
@@ -106,7 +131,7 @@ export default function UploadPage() {
               </div>
               <div className="grid grid-cols-3 gap-2.5 sm:grid-cols-4">
                 {up.items.map((it) => (
-                  <UploadTile key={it.id} item={it} onRemove={up.removeItem} />
+                  <UploadTile key={it.id} item={it} onRemove={up.removeItem} onRetry={up.retry} />
                 ))}
               </div>
             </div>
@@ -119,7 +144,7 @@ export default function UploadPage() {
         {up.total === 0 ? (
           <div className="flex flex-col gap-2.5">
             <Button block onClick={pick}><ImagePlus size={20} /> Choose photos</Button>
-            <Button block variant="outline" onClick={() => navigate(`/m/${memoryId}`)}>
+            <Button block variant="outline" onClick={() => leaveTo(`/m/${memoryId}`)}>
               <ChevronLeft size={20} /> Back
             </Button>
           </div>
@@ -127,7 +152,7 @@ export default function UploadPage() {
           <div className="flex flex-col gap-2.5">
             <Button block onClick={() => navigate(`/m/${memoryId}/library`)}>Go to Library</Button>
             <Button block variant="outline" onClick={up.reset}>Upload more</Button>
-            <p className="text-center text-[14px] text-faint">Add dates, names, and stories anytime — no rush.</p>
+            <p className="text-center text-[14px] text-muted">Add dates, names, and stories anytime — no rush.</p>
           </div>
         ) : (
           <p className="text-center text-[15px] font-semibold text-muted">

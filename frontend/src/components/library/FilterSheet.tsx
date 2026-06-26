@@ -2,13 +2,15 @@ import { clsx } from 'clsx';
 import Sheet from '../ui/Sheet';
 import Button from '../ui/Button';
 import { decadeLabel } from '../../lib/format';
-import type { LibraryFilter, LibrarySort, MemoryStats, Person } from '../../lib/types';
+import type { Contributor, LibraryFilter, LibrarySort, MemoryStats, Person } from '../../lib/types';
 
 export interface LibraryFilters {
   filter: LibraryFilter;
   sort: LibrarySort;
   decade?: number;
   person?: number;
+  tag?: string;
+  contributor?: number;
 }
 
 const SHOW: { key: LibraryFilter; label: string }[] = [
@@ -25,7 +27,7 @@ const SHOW: { key: LibraryFilter; label: string }[] = [
 const chip = 'rounded-full px-3.5 py-2 text-[15px] font-bold transition active:scale-95';
 
 export default function FilterSheet({
-  open, onClose, value, onChange, stats, people,
+  open, onClose, value, onChange, stats, people, tags, contributors,
 }: {
   open: boolean;
   onClose: () => void;
@@ -33,6 +35,8 @@ export default function FilterSheet({
   onChange: (patch: Partial<LibraryFilters>) => void;
   stats?: MemoryStats;
   people: Person[];
+  tags: string[];
+  contributors: Contributor[];
 }) {
   return (
     <Sheet
@@ -81,6 +85,35 @@ export default function FilterSheet({
                   className={clsx(chip, value.person === p.id ? 'text-white' : 'bg-chip text-body')}
                   style={value.person === p.id ? { background: p.accent } : undefined}>
                   {p.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {tags.length > 0 && (
+          <div>
+            <h4 className="mb-2.5 text-[13px] font-bold uppercase tracking-[0.06em] text-faint">Tag</h4>
+            <div className="flex flex-wrap gap-2">
+              {tags.map((t) => (
+                <button key={t} onClick={() => onChange({ tag: value.tag === t ? undefined : t })}
+                  className={clsx(chip, value.tag === t ? 'bg-terracotta text-white' : 'bg-chip text-body')}>
+                  {t}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {contributors.length > 0 && (
+          <div>
+            <h4 className="mb-2.5 text-[13px] font-bold uppercase tracking-[0.06em] text-faint">Who added it</h4>
+            <div className="flex flex-wrap gap-2">
+              {contributors.map((c) => (
+                <button key={c.id} onClick={() => onChange({ contributor: value.contributor === c.id ? undefined : c.id })}
+                  className={clsx(chip, value.contributor === c.id ? 'text-white' : 'bg-chip text-body')}
+                  style={value.contributor === c.id ? { background: c.accent } : undefined}>
+                  {c.name}
                 </button>
               ))}
             </div>

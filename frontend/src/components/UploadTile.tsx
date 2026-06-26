@@ -1,4 +1,4 @@
-import { Check, X, Copy, AlertCircle } from 'lucide-react';
+import { Check, X, Copy, RotateCcw } from 'lucide-react';
 import type { UploadItem } from '../hooks/useUploader';
 
 function Ring({ progress }: { progress: number }) {
@@ -16,7 +16,7 @@ function Ring({ progress }: { progress: number }) {
   );
 }
 
-export default function UploadTile({ item, onRemove }: { item: UploadItem; onRemove: (id: string) => void }) {
+export default function UploadTile({ item, onRemove, onRetry }: { item: UploadItem; onRemove: (id: string) => void; onRetry?: (id: string) => void }) {
   const inProgress = item.status === 'queued' || item.status === 'processing' || item.status === 'uploading';
 
   return (
@@ -42,9 +42,15 @@ export default function UploadTile({ item, onRemove }: { item: UploadItem; onRem
       )}
 
       {item.status === 'error' && (
-        <div className="absolute inset-0 grid place-items-center bg-[#A23D2F]/55 text-white">
-          <AlertCircle size={22} />
-        </div>
+        <button
+          type="button"
+          onClick={() => onRetry?.(item.id)}
+          aria-label="Couldn’t add — tap to retry"
+          className="absolute inset-0 grid place-items-center gap-1.5 bg-[#A23D2F]/65 px-2 text-center text-white active:bg-[#A23D2F]/80"
+        >
+          <RotateCcw size={22} strokeWidth={2.4} />
+          <span className="text-[12px] font-bold leading-tight">Couldn’t add — tap to retry</span>
+        </button>
       )}
 
       {inProgress && (

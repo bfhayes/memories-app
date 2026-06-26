@@ -76,6 +76,8 @@ export const api = {
     request<PhotoDetail>(`/photos/${photoId}`, { method: 'PATCH', body: JSON.stringify(body) }),
   deletePhoto: (photoId: number) =>
     request<{ ok: boolean; id: number }>(`/photos/${photoId}`, { method: 'DELETE' }),
+  restorePhoto: (photoId: number) =>
+    request<{ ok: boolean; id: number }>(`/photos/${photoId}/restore`, { method: 'POST' }),
   addPerson: (photoId: number, name: string) =>
     request<Person>(`/photos/${photoId}/people`, { method: 'POST', body: JSON.stringify({ name }) }),
   removePerson: (photoId: number, personId: number) =>

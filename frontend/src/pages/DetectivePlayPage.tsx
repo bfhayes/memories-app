@@ -72,7 +72,7 @@ export default function DetectivePlayPage() {
   if (!mission || !memory) { navigate(`/m/${memoryId}/detective`); return null; }
 
   const total = stats ? mission.count(stats) : queue.length;
-  const advance = () => setIndex((i) => i + 1);
+  const advance = () => { if (busy) return; setIndex((i) => i + 1); };
   const cheer = CHEERS[completed % CHEERS.length];
 
   const saveAndNext = async (fn: () => Promise<void>) => {
@@ -201,7 +201,7 @@ export default function DetectivePlayPage() {
             Save memory
           </Button>
         )}
-        <button onClick={advance} className="flex items-center justify-center gap-1.5 py-2 text-[16px] font-bold text-muted hover:text-ink">
+        <button onClick={advance} disabled={busy} className="flex items-center justify-center gap-1.5 py-2 text-[16px] font-bold text-muted hover:text-ink disabled:opacity-50 disabled:pointer-events-none">
           <SkipForward size={17} /> {mission.key === 'people' ? 'No one I know' : 'Skip for now'}
         </button>
       </div>

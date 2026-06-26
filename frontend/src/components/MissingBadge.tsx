@@ -16,7 +16,7 @@ export default function MissingBadge({ photo }: { photo: PhotoSummary }) {
   if (!top) return null;
   return (
     <span
-      className="pointer-events-none absolute bottom-2 left-2 inline-flex items-center rounded-full px-2.5 py-1 text-[12px] font-bold text-white"
+      className="pointer-events-none absolute bottom-2 left-2 inline-flex items-center rounded-full px-2.5 py-1 text-[13px] font-bold text-white"
       style={{ background: 'rgba(30,22,16,0.62)', backdropFilter: 'blur(2px)' }}
     >
       {LABELS[top]}

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { ChevronLeft, Heart, X, Trash2, MapPin } from 'lucide-react';
+import { ChevronLeft, Heart, X, Trash2, MapPin, Download, Share, Pencil } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useMemory } from '../context/MemoryContext';
 import { usePhoto, useSuggestions } from '../hooks/queries';
@@ -16,6 +16,7 @@ import Avatar from '../components/ui/Avatar';
 import Spinner from '../components/ui/Spinner';
 import Sheet from '../components/ui/Sheet';
 import Button from '../components/ui/Button';
+import EmptyState from '../components/ui/EmptyState';
 import AutosaveNote from '../components/ui/AutosaveNote';
 import MetaCard from '../components/detail/MetaCard';
 import FieldHistory from '../components/detail/FieldHistory';
@@ -74,19 +75,53 @@ export default function PhotoDetailPage() {
     return <div className="grid min-h-[100dvh] place-items-center text-terracotta"><Spinner size={28} /></div>;
   }
   if (!photo) {
-    return <div className="grid min-h-[100dvh] place-items-center text-muted">Photo not found.</div>;
+    return (
+      <div className="grid min-h-[100dvh] place-items-center bg-page px-6">
+        <EmptyState
+          glyph="🖼️"
+          title="Photo not found"
+          action={<Button block onClick={() => navigate(`/m/${memoryId}/library`)}>Back to library</Button>}
+        >
+          This photo may have been removed, or the link has expired.
+        </EmptyState>
+      </div>
+    );
   }
 
   const dateKnown = photo.date.confidence !== 'unknown' && !!photo.date.label;
   const conf = confidenceLabel(photo.date.confidence);
 
   const remove = async () => {
-    if (!confirm('Remove this photo from the memory? This can’t be undone.')) return;
+    if (!confirm('Remove this photo from the memory?')) return;
     await api.deletePhoto(photoId);
     qc.invalidateQueries({ queryKey: ['photos', memoryId] });
     qc.invalidateQueries({ queryKey: ['stats', memoryId] });
-    toast.show('Photo removed');
+    toast.show('Photo removed', 'default', {
+      label: 'Undo',
+      onClick: async () => {
+        await api.restorePhoto(photoId);
+        qc.invalidateQueries({ queryKey: ['photos', memoryId] });
+        qc.invalidateQueries({ queryKey: ['stats', memoryId] });
+      },
+    });
     navigate(`/m/${memoryId}/library`);
+  };
+
+  const canShare = typeof navigator !== 'undefined' && !!navigator.share;
+  const share = async () => {
+    const name = photo.meta.file ?? 'photo.jpg';
+    try {
+      try {
+        const res = await fetch(photo.url);
+        const blob = await res.blob();
+        const file = new File([blob], name, { type: blob.type || 'image/jpeg' });
+        if (navigator.canShare?.({ files: [file] })) {
+          await navigator.share({ files: [file], title: name });
+          return;
+        }
+      } catch { /* fall through to URL share */ }
+      await navigator.share({ url: location.href });
+    } catch { /* user cancelled or share failed — ignore */ }
   };
 
   return (
@@ -119,6 +154,25 @@ export default function PhotoDetailPage() {
           />
         </button>
 
+        {/* Photo actions */}
+        <div className="mt-3 flex items-center justify-center gap-2.5">
+          <a
+            href={photo.url}
+            download={photo.meta.file ?? 'photo.jpg'}
+            className="inline-flex items-center gap-1.5 rounded-full bg-chip px-4 py-2 text-[15px] font-bold text-ink transition hover:brightness-[0.98] active:scale-95"
+          >
+            <Download size={17} strokeWidth={2.2} /> Download
+          </a>
+          {canShare && (
+            <button
+              onClick={share}
+              className="inline-flex items-center gap-1.5 rounded-full bg-chip px-4 py-2 text-[15px] font-bold text-ink transition hover:brightness-[0.98] active:scale-95"
+            >
+              <Share size={17} strokeWidth={2.2} /> Share
+            </button>
+          )}
+        </div>
+
         <div className="mt-3 flex justify-center">
           <AutosaveNote saving={editor.saving} savedAt={editor.savedAt} error={editor.error} />
         </div>
@@ -143,6 +197,7 @@ export default function PhotoDetailPage() {
                   {conf && photo.date.confidence !== 'exact' && (
                     <span className="rounded-full bg-sage-tint px-2.5 py-1 text-[13px] font-bold text-sage-dark">{conf}</span>
                   )}
+                  <Pencil size={17} strokeWidth={2.2} className="ml-auto shrink-0 text-faint" />
                 </div>
               ) : (
                 <span className="text-[20px] font-extrabold text-terracotta/80">Add a date</span>
@@ -184,6 +239,7 @@ export default function PhotoDetailPage() {
               <button onClick={() => setEditingLocation(true)} className="flex w-full items-center gap-2 text-left">
                 <MapPin size={18} className="text-terracotta" />
                 <span className="text-[17px] font-semibold text-body">{photo.location}</span>
+                <Pencil size={17} strokeWidth={2.2} className="ml-auto shrink-0 text-faint" />
               </button>
             ) : editingLocation || photo.location ? (
               <ChipSuggestInput
@@ -299,8 +355,8 @@ export default function PhotoDetailPage() {
       {/* Lightbox */}
       {lightbox && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-black/90 p-4 animate-fade-in" onClick={() => setLightbox(false)}>
-          <img src={photo.url} alt="" className="max-h-full max-w-full rounded-lg object-contain" />
-          <button className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-full bg-white/15 text-white safe-top" aria-label="Close">
+          <img src={photo.url} alt="" onClick={(e) => e.stopPropagation()} className="max-h-full max-w-full rounded-lg object-contain" />
+          <button onClick={() => setLightbox(false)} className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-full bg-white/15 text-white safe-top" aria-label="Close">
             <X size={24} />
           </button>
         </div>

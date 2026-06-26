@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { ChevronLeft, Lock } from 'lucide-react';
+import { ChevronLeft, Lock, Eye, EyeOff } from 'lucide-react';
 import { api } from '../api/client';
 import { useMemory } from '../context/MemoryContext';
 import Photo from '../components/ui/Photo';
@@ -12,6 +12,7 @@ export default function GatePage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -56,22 +57,33 @@ export default function GatePage() {
         </p>
 
         <form onSubmit={submit} className="mt-6 w-full">
-          <input
-            type="password"
-            inputMode="text"
-            autoFocus
-            value={password}
-            onChange={(e) => { setPassword(e.target.value); setError(null); }}
-            placeholder="Password"
-            className="h-[64px] w-full rounded-[16px] border-2 border-terracotta bg-white px-5 text-center text-[20px] font-bold tracking-wide text-ink placeholder:font-medium placeholder:tracking-normal placeholder:text-placeholder outline-none focus:ring-4 focus:ring-terracotta/15"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              inputMode="text"
+              autoFocus
+              value={password}
+              onChange={(e) => { setPassword(e.target.value); setError(null); }}
+              placeholder="Password"
+              className="h-[64px] w-full rounded-[16px] border-2 border-terracotta bg-white pl-[56px] pr-[56px] text-center text-[20px] font-bold tracking-wide text-ink placeholder:font-medium placeholder:tracking-normal placeholder:text-placeholder outline-none focus:ring-4 focus:ring-terracotta/15"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              aria-pressed={showPassword}
+              className="absolute right-1.5 top-1/2 grid h-[52px] w-[52px] -translate-y-1/2 place-items-center rounded-[12px] text-muted hover:text-ink active:scale-95"
+            >
+              {showPassword ? <EyeOff size={26} strokeWidth={2.2} /> : <Eye size={26} strokeWidth={2.2} />}
+            </button>
+          </div>
           {error && <p className="mt-3 text-[15px] font-semibold text-[#A23D2F]">{error}</p>}
           <Button type="submit" block className="mt-4" disabled={submitting || !password}>
             {submitting ? 'Opening…' : 'Open Memory'}
           </Button>
         </form>
 
-        <p className="mt-5 max-w-xs text-[14px] leading-relaxed text-faint">
+        <p className="mt-5 max-w-xs text-[14px] leading-relaxed text-muted">
           Didn’t get a password? Ask whoever invited you to this memory.
         </p>
       </div>

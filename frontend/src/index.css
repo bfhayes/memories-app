@@ -73,7 +73,9 @@ input, textarea, button, select {
 ::placeholder { color: var(--color-placeholder); }
 
 :focus-visible {
-  outline: none;
+  outline: 3px solid var(--color-terracotta);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /* Safe-area helpers for notched phones (PWA, viewport-fit=cover) */

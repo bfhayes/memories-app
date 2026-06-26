@@ -31,9 +31,13 @@ export function usePhotoEditor(photoId: number, memoryId: number) {
     async (optimistic: (() => void) | null, serverCall: () => Promise<PhotoDetail | null>) => {
       setPending((p) => p + 1);
       setError(null);
+      // Cancel any in-flight photo query so a stale poll can't clobber the optimistic update.
+      await qc.cancelQueries({ queryKey: ['photo', photoId] });
       optimistic?.();
       try {
         const fresh = await serverCall();
+        // Discard a poll that started during the request before the authoritative write.
+        await qc.cancelQueries({ queryKey: ['photo', photoId] });
         if (fresh) qc.setQueryData(['photo', photoId], fresh);
         setSavedAt(Date.now());
         invalidateLists();

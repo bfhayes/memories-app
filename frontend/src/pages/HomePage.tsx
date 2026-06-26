@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Lock, Search } from 'lucide-react';
 import { useMemory } from '../context/MemoryContext';
 import { useStats } from '../hooks/queries';
+import { hasOnboarded, markOnboarded } from '../lib/identity';
 import MemoryBar from '../components/MemoryBar';
+import Button from '../components/ui/Button';
 
 function firstName(name: string): string {
   const n = name.trim();
@@ -13,9 +16,12 @@ function firstName(name: string): string {
 export default function HomePage() {
   const { memory, memoryId, identity, clearIdentity } = useMemory();
   const { data: stats } = useStats(memoryId);
+  const [showWelcome, setShowWelcome] = useState(() => !hasOnboarded());
   if (!memory) return null;
 
   const needs = stats?.needsInfo ?? 0;
+
+  const dismissWelcome = () => { markOnboarded(); setShowWelcome(false); };
 
   return (
     <div className="mx-auto min-h-[100dvh] max-w-xl">
@@ -35,6 +41,19 @@ export default function HomePage() {
         <p className="mt-3 text-[17px] leading-relaxed text-muted">
           Add photos from your phone, or browse what’s here and fill in the details — names, dates, and stories.
         </p>
+
+        {showWelcome && (
+          <div className="mt-6 rounded-[22px] bg-sand p-5 shadow-feature">
+            <h2 className="text-[20px] font-extrabold tracking-[-0.01em] text-ink">Welcome 👋</h2>
+            <p className="mt-2 text-[16px] leading-relaxed text-muted">
+              Two things you can do here: add photos, or help fill in names, dates, and stories.
+              Nothing’s required — add what you can, whenever.
+            </p>
+            <div className="mt-4">
+              <Button onClick={dismissWelcome}>Got it</Button>
+            </div>
+          </div>
+        )}
 
         <div className="mt-7 flex flex-col gap-4">
           <Link
@@ -77,7 +96,7 @@ export default function HomePage() {
           )}
         </div>
 
-        <footer className="mt-10 flex items-center justify-center gap-1.5 text-[14px] font-medium text-faint">
+        <footer className="mt-10 flex items-center justify-center gap-1.5 text-[14px] font-medium text-muted">
           <Lock size={14} /> Private to your family
         </footer>
       </div>
