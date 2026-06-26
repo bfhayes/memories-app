@@ -104,9 +104,16 @@ export default function DetectivePlayPage() {
         </div>
       </div>
 
-      {/* Photo */}
+      {/* Photo — shown whole (uncropped) at its natural aspect ratio, capped in height. */}
       <div className="mt-5 flex justify-center">
-        <Photo src={current.thumbUrl} tone={current.tone} loading="eager" className="w-full rounded-[22px] shadow-feature" imgClassName="max-h-[42vh] object-contain bg-bezel" />
+        <Photo
+          src={current.thumbUrl}
+          tone={current.tone}
+          contain
+          loading="eager"
+          className="w-full rounded-[22px] shadow-feature"
+          style={{ aspectRatio: current.width && current.height ? `${current.width} / ${current.height}` : '4 / 3', maxHeight: '42vh' }}
+        />
       </div>
 
       <h2 className="mt-5 text-center text-[24px] font-extrabold tracking-[-0.01em] text-ink">{mission.prompt}</h2>

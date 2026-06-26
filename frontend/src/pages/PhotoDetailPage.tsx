@@ -103,9 +103,10 @@ export default function PhotoDetailPage() {
           <Photo
             src={photo.thumbUrl}
             tone={photo.tone}
+            contain
             loading="eager"
             className="w-full rounded-[22px] shadow-feature"
-            imgClassName="max-h-[60vh] object-contain bg-bezel"
+            style={{ aspectRatio: photo.width && photo.height ? `${photo.width} / ${photo.height}` : '4 / 3', maxHeight: '60vh' }}
           />
         </button>
 
