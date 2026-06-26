@@ -20,18 +20,22 @@ export default function PhotoTile({
   onToggle?: (id: number) => void;
   onToggleLike?: (id: number, liked: boolean) => void;
 }) {
-  const aspect = photo.width && photo.height ? `${photo.width} / ${photo.height}` : '1 / 1';
+  // Reserve height with the padding-ratio technique (% of width), NOT CSS `aspect-ratio` —
+  // WebKit collapses aspect-ratio to 0 height inside a CSS `columns` masonry on re-render
+  // (e.g. toggling selection), which made selected tiles vanish in Safari.
+  const pad = photo.width && photo.height ? (photo.height / photo.width) * 100 : 100;
 
   const inner = (
     <div
       className={clsx(
         'relative w-full overflow-hidden rounded-[16px] bg-sand transition',
-        selectMode && 'cursor-pointer',
         selected && 'ring-[3px] ring-terracotta ring-offset-2 ring-offset-page',
       )}
-      style={{ aspectRatio: aspect }}
+      style={{ paddingBottom: `${pad}%` }}
     >
-      <Photo src={photo.thumbUrl} tone={photo.tone} className="h-full w-full" />
+      <div className="absolute inset-0">
+        <Photo src={photo.thumbUrl} tone={photo.tone} className="h-full w-full" />
+      </div>
 
       {/* Like heart — tappable straight from the grid (doesn't open the photo). */}
       {!selectMode && (
@@ -66,8 +70,7 @@ export default function PhotoTile({
     </div>
   );
 
-  // Always a <Link> so the tile/image isn't remounted when toggling select mode (which would
-  // drop cached images to opacity:0). In select mode we intercept the click to toggle instead.
+  // Always a <Link> so the tile/image isn't remounted when toggling select mode.
   return (
     <Link
       to={`/m/${memoryId}/photo/${photo.id}`}
