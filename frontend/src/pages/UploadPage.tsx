@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Check, ImagePlus } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useMemory } from '../context/MemoryContext';
@@ -49,21 +49,7 @@ export default function UploadPage() {
         onChange={(e) => { if (e.target.files) up.addFiles(e.target.files); e.target.value = ''; }}
       />
 
-      <header className="flex items-center gap-2 px-5 pt-4 pb-2 safe-top sm:px-6">
-        <Link
-          to={`/m/${memoryId}`}
-          onClick={(e) => {
-            if (up.inFlight && !window.confirm('Photos are still uploading — leave anyway? Unfinished ones won’t be saved.')) {
-              e.preventDefault();
-            }
-          }}
-          className="flex items-center gap-1 text-[16px] font-bold text-muted hover:text-ink"
-        >
-          <ChevronLeft size={20} /> {up.inFlight ? 'Uploading' : 'Back'}
-        </Link>
-      </header>
-
-      <div className="flex-1 px-5 pb-32 sm:px-6">
+      <div className="flex-1 px-5 pb-32 pt-5 safe-top sm:px-6">
         {up.total === 0 && (
           <div className="pt-2">
             <h1 className="text-[31px] font-extrabold leading-[1.12] tracking-[-0.02em] text-ink">Add photos</h1>
@@ -144,8 +130,8 @@ export default function UploadPage() {
         {up.total === 0 ? (
           <div className="flex flex-col gap-2.5">
             <Button block onClick={pick}><ImagePlus size={20} /> Choose photos</Button>
-            <Button block variant="outline" onClick={() => leaveTo(`/m/${memoryId}`)}>
-              <ChevronLeft size={20} /> Back
+            <Button block variant="outline" onClick={() => leaveTo(`/m/${memoryId}/library`)}>
+              <ChevronLeft size={20} /> Back to Library
             </Button>
           </div>
         ) : allDone ? (
