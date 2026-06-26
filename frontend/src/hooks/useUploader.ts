@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { processImage } from '../lib/image';
 
-export type UploadStatus = 'queued' | 'processing' | 'uploading' | 'done' | 'duplicate' | 'error';
+export type UploadStatus =
+  | 'queued' | 'processing' | 'uploading' | 'done' | 'duplicate' | 'error';
 
 export interface UploadItem {
   id: string;
@@ -15,6 +16,7 @@ export interface UploadItem {
 }
 
 const CONCURRENCY = 3;
+const STALL_TIMEOUT_MS = 120_000; // a single upload that makes no progress for this long fails
 let counter = 0;
 
 function xhrUpload(
@@ -22,14 +24,14 @@ function xhrUpload(
   form: FormData,
   contributorId: number | null,
   onProgress: (p: number) => void,
+  register: (xhr: XMLHttpRequest) => void,
 ): Promise<{ duplicate: boolean; photo: { id: number } }> {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', url);
+    xhr.timeout = STALL_TIMEOUT_MS;
     if (contributorId != null) xhr.setRequestHeader('X-Contributor-Id', String(contributorId));
-    xhr.upload.onprogress = (e) => {
-      if (e.lengthComputable) onProgress(e.loaded / e.total);
-    };
+    xhr.upload.onprogress = (e) => { if (e.lengthComputable) onProgress(e.loaded / e.total); };
     xhr.onload = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
         try { resolve(JSON.parse(xhr.responseText)); }
@@ -41,29 +43,46 @@ function xhrUpload(
       }
     };
     xhr.onerror = () => reject(new Error('Network error'));
+    xhr.ontimeout = () => reject(new Error('Upload timed out'));
+    xhr.onabort = () => reject(new DOMException('Aborted', 'AbortError'));
+    register(xhr);
     xhr.send(form);
   });
 }
 
+/**
+ * Upload queue. itemsRef is the single source of truth; React state mirrors it. A small pool keeps
+ * CONCURRENCY uploads in flight. Removing an item aborts its in-flight request, and a stalled upload
+ * times out rather than showing "loading" forever.
+ */
 export function useUploader(memoryId: number, contributorId: number | null) {
   const qc = useQueryClient();
   const [items, setItems] = useState<UploadItem[]>([]);
-  const itemsRef = useRef<UploadItem[]>([]);
+  const itemsRef = useRef<UploadItem[]>([]);          // authoritative store — never reset from state
   const activeRef = useRef(0);
-  itemsRef.current = items;
+  const xhrsRef = useRef<Map<string, XMLHttpRequest>>(new Map());
+  const removedRef = useRef<Set<string>>(new Set());
 
-  const update = useCallback((id: string, patch: Partial<UploadItem>) => {
-    setItems((prev) => prev.map((it) => (it.id === id ? { ...it, ...patch } : it)));
-  }, []);
+  const commit = useCallback(() => { setItems(itemsRef.current.slice()); }, []);
 
-  const processOne = useCallback(async (item: UploadItem) => {
+  const patch = useCallback((id: string, p: Partial<UploadItem>) => {
+    const i = itemsRef.current.findIndex((x) => x.id === id);
+    if (i === -1) return; // item was removed — ignore late writes
+    itemsRef.current[i] = { ...itemsRef.current[i], ...p };
+    commit();
+  }, [commit]);
+
+  const processOne = useCallback(async (id: string) => {
+    const item = itemsRef.current.find((x) => x.id === id);
+    if (!item || removedRef.current.has(id)) return;
     try {
-      update(item.id, { status: 'processing' });
+      patch(id, { status: 'processing' });
       const processed = await processImage(item.file);
+      if (removedRef.current.has(id)) return;
+
       const form = new FormData();
       form.append('original', item.file, item.file.name);
-      const thumbFile = new File([processed.thumb], 'thumb.jpg', { type: 'image/jpeg' });
-      form.append('thumb', thumbFile);
+      form.append('thumb', new File([processed.thumb], 'thumb.jpg', { type: 'image/jpeg' }));
       form.append('meta', JSON.stringify({
         fileName: item.file.name,
         width: processed.width,
@@ -71,86 +90,87 @@ export function useUploader(memoryId: number, contributorId: number | null) {
         tone: processed.tone,
         exifDate: processed.exifDate,
       }));
-      update(item.id, { status: 'uploading', progress: 0 });
+
+      patch(id, { status: 'uploading', progress: 0 });
       const res = await xhrUpload(
         `/api/memories/${memoryId}/photos`,
         form,
         contributorId,
-        (p) => update(item.id, { progress: p }),
+        (prog) => patch(id, { progress: prog }),
+        (xhr) => xhrsRef.current.set(id, xhr),
       );
-      update(item.id, {
-        status: res.duplicate ? 'duplicate' : 'done',
-        progress: 1,
-        photoId: res.photo?.id,
-      });
+      if (removedRef.current.has(id)) return;
+      patch(id, { status: res.duplicate ? 'duplicate' : 'done', progress: 1, photoId: res.photo?.id });
     } catch (e) {
-      update(item.id, { status: 'error', error: e instanceof Error ? e.message : 'Failed' });
+      if (removedRef.current.has(id) || (e instanceof DOMException && e.name === 'AbortError')) return;
+      patch(id, { status: 'error', error: e instanceof Error ? e.message : 'Failed' });
+    } finally {
+      xhrsRef.current.delete(id);
     }
-  }, [memoryId, contributorId, update]);
+  }, [memoryId, contributorId, patch]);
 
-  // Pump: keep CONCURRENCY uploads in flight.
+  // Keep CONCURRENCY uploads in flight. Claims each item synchronously so it can't be picked twice.
   const pump = useCallback(() => {
     while (activeRef.current < CONCURRENCY) {
       const next = itemsRef.current.find((it) => it.status === 'queued');
       if (!next) break;
       activeRef.current += 1;
-      // Mark immediately so the pump doesn't pick it again.
-      itemsRef.current = itemsRef.current.map((it) =>
-        it.id === next.id ? { ...it, status: 'processing' } : it);
-      setItems(itemsRef.current);
-      processOne(next).finally(() => {
+      patch(next.id, { status: 'processing' }); // claim
+      processOne(next.id).finally(() => {
         activeRef.current -= 1;
         qc.invalidateQueries({ queryKey: ['photos', memoryId] });
         qc.invalidateQueries({ queryKey: ['stats', memoryId] });
         pump();
       });
     }
-  }, [processOne, qc, memoryId]);
+  }, [processOne, patch, qc, memoryId]);
 
   const addFiles = useCallback((files: File[] | FileList) => {
-    const arr = Array.from(files).filter((f) => f.type.startsWith('image/') || /\.(jpe?g|png|gif|heic|heif|webp|tiff?)$/i.test(f.name));
+    const arr = Array.from(files).filter(
+      (f) => f.type.startsWith('image/') || /\.(jpe?g|png|gif|heic|heif|webp|tiff?)$/i.test(f.name),
+    );
     if (arr.length === 0) return;
-    const newItems: UploadItem[] = arr.map((file) => ({
-      id: `u${++counter}`,
-      file,
-      preview: URL.createObjectURL(file),
-      status: 'queued',
-      progress: 0,
-    }));
-    setItems((prev) => {
-      itemsRef.current = [...prev, ...newItems];
-      return itemsRef.current;
-    });
-    // Kick the pump on the next tick so state has settled.
-    setTimeout(pump, 0);
-  }, [pump]);
+    for (const file of arr) {
+      itemsRef.current.push({
+        id: `u${++counter}`,
+        file,
+        preview: URL.createObjectURL(file),
+        status: 'queued',
+        progress: 0,
+      });
+    }
+    commit();
+    pump();
+  }, [commit, pump]);
 
   const removeItem = useCallback((id: string) => {
-    setItems((prev) => {
-      const it = prev.find((x) => x.id === id);
-      if (it) URL.revokeObjectURL(it.preview);
-      itemsRef.current = prev.filter((x) => x.id !== id);
-      return itemsRef.current;
-    });
-  }, []);
+    removedRef.current.add(id);
+    xhrsRef.current.get(id)?.abort(); // abort an in-flight upload
+    const it = itemsRef.current.find((x) => x.id === id);
+    if (it) URL.revokeObjectURL(it.preview);
+    itemsRef.current = itemsRef.current.filter((x) => x.id !== id);
+    commit();
+  }, [commit]);
 
   const reset = useCallback(() => {
-    itemsRef.current.forEach((it) => URL.revokeObjectURL(it.preview));
+    itemsRef.current.forEach((it) => { removedRef.current.add(it.id); xhrsRef.current.get(it.id)?.abort(); URL.revokeObjectURL(it.preview); });
     itemsRef.current = [];
-    setItems([]);
+    commit();
+  }, [commit]);
+
+  useEffect(() => () => {
+    itemsRef.current.forEach((it) => { xhrsRef.current.get(it.id)?.abort(); URL.revokeObjectURL(it.preview); });
   }, []);
 
-  useEffect(() => () => { itemsRef.current.forEach((it) => URL.revokeObjectURL(it.preview)); }, []);
-
+  const isFinal = (s: UploadStatus) => s === 'done' || s === 'duplicate' || s === 'error';
   const total = items.length;
-  const finished = items.filter((i) => i.status === 'done' || i.status === 'duplicate' || i.status === 'error').length;
+  const finished = items.filter((i) => isFinal(i.status)).length;
   const succeeded = items.filter((i) => i.status === 'done').length;
   const duplicates = items.filter((i) => i.status === 'duplicate').length;
   const failed = items.filter((i) => i.status === 'error').length;
-  const inFlight = items.some((i) => i.status === 'uploading' || i.status === 'processing' || i.status === 'queued');
-  // Overall progress blends per-item upload progress.
+  const inFlight = items.some((i) => !isFinal(i.status));
   const overall = total === 0 ? 0
-    : items.reduce((s, i) => s + (i.status === 'done' || i.status === 'duplicate' || i.status === 'error' ? 1 : i.progress), 0) / total;
+    : items.reduce((s, i) => s + (isFinal(i.status) ? 1 : i.progress), 0) / total;
 
   return {
     items, addFiles, removeItem, reset,
