@@ -117,7 +117,12 @@ export default function UploadPage() {
       {/* Sticky actions */}
       <div className="sticky bottom-0 border-t border-line-divider bg-warm/95 px-5 py-4 backdrop-blur safe-bottom sm:px-6">
         {up.total === 0 ? (
-          <Button block onClick={pick}><ImagePlus size={20} /> Choose photos</Button>
+          <div className="flex flex-col gap-2.5">
+            <Button block onClick={pick}><ImagePlus size={20} /> Choose photos</Button>
+            <Button block variant="outline" onClick={() => navigate(`/m/${memoryId}`)}>
+              <ChevronLeft size={20} /> Back
+            </Button>
+          </div>
         ) : allDone ? (
           <div className="flex flex-col gap-2.5">
             <Button block onClick={() => navigate(`/m/${memoryId}/library`)}>Go to Library</Button>
