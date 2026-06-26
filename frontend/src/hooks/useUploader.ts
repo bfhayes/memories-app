@@ -88,7 +88,6 @@ export function useUploader(memoryId: number, contributorId: number | null) {
         width: processed.width,
         height: processed.height,
         tone: processed.tone,
-        exifDate: processed.exifDate,
       }));
 
       patch(id, { status: 'uploading', progress: 0 });

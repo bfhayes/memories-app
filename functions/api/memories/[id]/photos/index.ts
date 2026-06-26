@@ -2,7 +2,6 @@ import { all, first, run, nowIso } from '../../../../lib/db';
 import { jsonNoStore } from '../../../../lib/request';
 import { requireMemoryAccess, getCaller } from '../../../../lib/guard';
 import { deriveDate, logActivity, touchContributor, pickColor, PHOTO_TONES } from '../../../../lib/util';
-import type { DateConfidence } from '../../../../lib/util';
 import type { CFContext } from '../../../../lib/env';
 
 interface PhotoRow {
@@ -227,11 +226,9 @@ export const onRequestPost = async (context: CFContext): Promise<Response> => {
   const height = Number(meta.height) || null;
   const tone = typeof meta.tone === 'string' && meta.tone ? meta.tone : pickColor(PHOTO_TONES, uuid);
 
-  // Seed date from EXIF when the camera recorded one.
-  const exifDate = typeof meta.exifDate === 'string' ? meta.exifDate : '';
-  const d = exifDate
-    ? deriveDate(exifDate.slice(0, 10), 'exact' as DateConfidence)
-    : deriveDate(null, 'unknown');
+  // Date is intentionally left UNKNOWN. Scanned/digitized photos carry the wrong EXIF date
+  // (the scan time, not when the photo was actually taken), so people fill in the real date later.
+  const d = deriveDate(null, 'unknown');
 
   const ts = nowIso();
   const res = await run(

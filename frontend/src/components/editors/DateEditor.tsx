@@ -3,12 +3,13 @@ import { clsx } from 'clsx';
 import { MONTHS, approxPresets, clientDeriveDate } from '../../lib/format';
 import type { DateConfidence, PhotoDate } from '../../lib/types';
 
+// Ordered easiest → most specific. Year is the obvious first pass; day is last.
 const MODES: { key: DateConfidence; label: string }[] = [
-  { key: 'exact', label: 'Exact date' },
-  { key: 'month-year', label: 'Month + Year' },
   { key: 'year', label: 'Year' },
+  { key: 'month-year', label: 'Month + Year' },
+  { key: 'exact', label: 'Exact day' },
   { key: 'approx', label: 'Approximate' },
-  { key: 'unknown', label: 'Not sure' },
+  { key: 'unknown', label: 'Don’t know' },
 ];
 
 const chip = 'rounded-full px-3.5 py-2 text-[15px] font-bold transition active:scale-95';
@@ -22,9 +23,9 @@ export default function DateEditor({
   value: PhotoDate;
   onChange: (d: PhotoDate) => void;
 }) {
-  const [mode, setMode] = useState<DateConfidence>(value.confidence === 'unknown' ? 'approx' : value.confidence);
+  // Default to Year — the easiest, most-useful first pass.
+  const [mode, setMode] = useState<DateConfidence>(value.confidence === 'unknown' ? 'year' : value.confidence);
 
-  // Seed raw inputs from the stored value.
   const seed = value.value ?? '';
   const [exact, setExact] = useState(/^\d{4}-\d{2}-\d{2}$/.test(seed) ? seed : '');
   const [year, setYear] = useState(/(\d{4})/.exec(seed)?.[1] ?? '');
@@ -44,6 +45,13 @@ export default function DateEditor({
     if (m === 'approx') emit(m, approx);
   };
 
+  const setYearVal = (raw: string, m: DateConfidence) => {
+    const y = raw.replace(/\D/g, '').slice(0, 4);
+    setYear(y);
+    if (m === 'year') emit('year', y);
+    else emit('month-year', y ? `${y}-${month}` : '');
+  };
+
   return (
     <div>
       <div className="flex flex-wrap gap-2">
@@ -59,14 +67,18 @@ export default function DateEditor({
       </div>
 
       <div className="mt-4">
-        {mode === 'exact' && (
-          <input
-            type="date"
-            className={field}
-            value={exact}
-            max={new Date().toISOString().slice(0, 10)}
-            onChange={(e) => { setExact(e.target.value); emit('exact', e.target.value); }}
-          />
+        {mode === 'year' && (
+          <div>
+            <input
+              autoFocus
+              inputMode="numeric"
+              placeholder="e.g. 1975"
+              value={year}
+              onChange={(e) => setYearVal(e.target.value, 'year')}
+              className={clsx(field, 'text-center text-[28px] font-extrabold tracking-wide')}
+            />
+            <p className="mt-2 text-center text-[14px] text-muted">Even just the year is a big help. Add the month or day later if you remember.</p>
+          </div>
         )}
 
         {mode === 'month-year' && (
@@ -81,22 +93,22 @@ export default function DateEditor({
               ))}
             </select>
             <input
-              className={clsx(field, 'w-28')}
+              className={clsx(field, 'w-28 text-center')}
               inputMode="numeric"
               placeholder="Year"
               value={year}
-              onChange={(e) => { const y = e.target.value.replace(/\D/g, '').slice(0, 4); setYear(y); emit('month-year', y ? `${y}-${month}` : ''); }}
+              onChange={(e) => setYearVal(e.target.value, 'month-year')}
             />
           </div>
         )}
 
-        {mode === 'year' && (
+        {mode === 'exact' && (
           <input
+            type="date"
             className={field}
-            inputMode="numeric"
-            placeholder="e.g. 1962"
-            value={year}
-            onChange={(e) => { const y = e.target.value.replace(/\D/g, '').slice(0, 4); setYear(y); emit('year', y); }}
+            value={exact}
+            max={new Date().toISOString().slice(0, 10)}
+            onChange={(e) => { setExact(e.target.value); emit('exact', e.target.value); }}
           />
         )}
 
@@ -124,7 +136,7 @@ export default function DateEditor({
 
         {mode === 'unknown' && (
           <p className="rounded-[14px] bg-sand px-4 py-4 text-[15px] leading-relaxed text-muted">
-            No problem — leaving it blank is fine. Even a rough guess like a decade is a huge help later.
+            No problem — leaving it blank is fine. Someone in the family can add it whenever they remember.
           </p>
         )}
       </div>

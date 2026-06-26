@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, SlidersHorizontal, CheckSquare, ImagePlus, X } from 'lucide-react';
+import { Search, SlidersHorizontal, CheckSquare, ImagePlus, X, ArrowUpDown } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useMemory } from '../context/MemoryContext';
 import { usePhotosInfinite, useStats, useSuggestions } from '../hooks/queries';
@@ -14,6 +14,7 @@ import Spinner from '../components/ui/Spinner';
 import Button from '../components/ui/Button';
 import BottomNav from '../components/ui/BottomNav';
 import FilterSheet, { type LibraryFilters } from '../components/library/FilterSheet';
+import SortSheet, { sortLabel } from '../components/library/SortSheet';
 import BulkEditSheet from '../components/library/BulkEditSheet';
 import Brand from '../components/Brand';
 import type { LibraryFilter } from '../lib/types';
@@ -44,6 +45,7 @@ export default function LibraryPage() {
   const [selectMode, setSelectMode] = useState(false);
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [filterOpen, setFilterOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
   const [bulkOpen, setBulkOpen] = useState(false);
 
   const { data: stats } = useStats(memoryId);
@@ -71,7 +73,7 @@ export default function LibraryPage() {
   const exitSelect = () => { setSelectMode(false); setSelected(new Set()); };
 
   const personName = suggestions?.people.find((p) => p.id === filters.person)?.name;
-  const activeExtras = (filters.decade ? 1 : 0) + (filters.person ? 1 : 0) + (filters.sort !== 'recent_uploaded' ? 1 : 0);
+  const activeExtras = (filters.decade ? 1 : 0) + (filters.person ? 1 : 0);
 
   const searchBar = (
     <div className="relative">
@@ -137,6 +139,12 @@ export default function LibraryPage() {
         <Link to="/" className="shrink-0"><Brand compact /></Link>
         <span className="text-[17px] font-extrabold text-ink">{memory.name}</span>
         <div className="mx-auto w-full max-w-md">{searchBar}</div>
+        <button
+          onClick={() => setSortOpen(true)}
+          className="flex items-center gap-2 rounded-[14px] bg-chip px-4 py-2.5 text-[15px] font-bold text-body transition hover:brightness-95"
+        >
+          <ArrowUpDown size={18} /> {sortLabel(filters.sort)}
+        </button>
         <button
           onClick={() => (selectMode ? exitSelect() : setSelectMode(true))}
           className={clsx('flex items-center gap-2 rounded-[14px] px-4 py-2.5 text-[15px] font-bold transition', selectMode ? 'bg-ink text-white' : 'bg-chip text-body hover:brightness-95')}
@@ -222,6 +230,10 @@ export default function LibraryPage() {
                   {c.label}
                 </button>
               ))}
+              <button onClick={() => setSortOpen(true)}
+                className="flex shrink-0 items-center gap-1.5 rounded-full border border-line bg-white px-4 py-2 text-[15px] font-bold text-body transition">
+                <ArrowUpDown size={16} /> {sortLabel(filters.sort)}
+              </button>
               <button onClick={() => setFilterOpen(true)}
                 className={clsx('flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-[15px] font-bold transition', activeExtras > 0 ? 'bg-ink text-white' : 'bg-white border border-line text-body')}>
                 <SlidersHorizontal size={16} /> Filters{activeExtras > 0 ? ` · ${activeExtras}` : ''}
@@ -262,6 +274,12 @@ export default function LibraryPage() {
 
       {!selectMode && <BottomNav memoryId={memoryId} />}
 
+      <SortSheet
+        open={sortOpen}
+        onClose={() => setSortOpen(false)}
+        value={filters.sort}
+        onChange={(s) => patch({ sort: s })}
+      />
       <FilterSheet
         open={filterOpen}
         onClose={() => setFilterOpen(false)}

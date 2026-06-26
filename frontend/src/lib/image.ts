@@ -1,4 +1,3 @@
-import exifr from 'exifr';
 import { toneFor } from './tones';
 
 export interface ProcessedImage {
@@ -6,26 +5,10 @@ export interface ProcessedImage {
   width: number | null;
   height: number | null;
   tone: string;
-  exifDate: string | null; // YYYY-MM-DD or null
 }
 
 const THUMB_MAX_EDGE = 1280;
 const THUMB_QUALITY = 0.82;
-
-/** Read EXIF DateTimeOriginal (fallback CreateDate) → YYYY-MM-DD. */
-async function readExifDate(file: File): Promise<string | null> {
-  try {
-    const out = await exifr.parse(file, ['DateTimeOriginal', 'CreateDate', 'ModifyDate']);
-    const d: unknown = out?.DateTimeOriginal ?? out?.CreateDate ?? out?.ModifyDate;
-    if (d instanceof Date && !Number.isNaN(d.getTime())) {
-      const y = d.getFullYear();
-      if (y > 1826 && y <= new Date().getFullYear() + 1) {
-        return `${y}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      }
-    }
-  } catch { /* no exif — fine */ }
-  return null;
-}
 
 async function decode(file: File): Promise<ImageBitmap | null> {
   try {
@@ -35,7 +18,7 @@ async function decode(file: File): Promise<ImageBitmap | null> {
   }
 }
 
-function averageTone(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D): string {
+function averageTone(canvas: HTMLCanvasElement): string {
   try {
     const sample = document.createElement('canvas');
     sample.width = 1;
@@ -44,23 +27,24 @@ function averageTone(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D): 
     if (!sctx) return toneFor(Math.random());
     sctx.drawImage(canvas, 0, 0, 1, 1);
     const [r, g, b] = sctx.getImageData(0, 0, 1, 1).data;
-    // Nudge toward the warm/muted vintage feel.
     const hex = (n: number) => Math.round(n).toString(16).padStart(2, '0');
     return `#${hex(r)}${hex(g)}${hex(b)}`;
   } catch {
-    void ctx;
     return toneFor(Math.random());
   }
 }
 
-/** Make a downsized thumbnail, read natural dimensions, sample an average tone + EXIF date. */
+/**
+ * Make a downsized thumbnail, read natural dimensions, and sample an average tone.
+ *
+ * We deliberately do NOT read the EXIF date: scanned/digitized old photos carry the scan date,
+ * not when the photo was taken, so it would be wrong. People set the real date by hand.
+ */
 export async function processImage(file: File): Promise<ProcessedImage> {
-  const exifDate = await readExifDate(file);
   const bitmap = await decode(file);
-
   if (!bitmap) {
-    // Unsupported decode (e.g. some HEIC) — upload original as its own thumb, tolerate.
-    return { thumb: file, width: null, height: null, tone: toneFor(file.name), exifDate };
+    // Unsupported decode (e.g. some HEIC) — upload the original as its own thumb, tolerate.
+    return { thumb: file, width: null, height: null, tone: toneFor(file.name) };
   }
 
   const { width, height } = bitmap;
@@ -74,20 +58,16 @@ export async function processImage(file: File): Promise<ProcessedImage> {
   const ctx = canvas.getContext('2d');
   if (!ctx) {
     bitmap.close();
-    return { thumb: file, width, height, tone: toneFor(file.name), exifDate };
+    return { thumb: file, width, height, tone: toneFor(file.name) };
   }
   ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(bitmap, 0, 0, w, h);
   bitmap.close();
 
-  const tone = averageTone(canvas, ctx);
+  const tone = averageTone(canvas);
   const thumb = await new Promise<Blob>((resolve) => {
-    canvas.toBlob(
-      (b) => resolve(b ?? file),
-      'image/jpeg',
-      THUMB_QUALITY,
-    );
+    canvas.toBlob((b) => resolve(b ?? file), 'image/jpeg', THUMB_QUALITY);
   });
 
-  return { thumb, width, height, tone, exifDate };
+  return { thumb, width, height, tone };
 }

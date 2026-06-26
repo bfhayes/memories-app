@@ -11,14 +11,6 @@ export interface LibraryFilters {
   person?: number;
 }
 
-const SORTS: { key: LibrarySort; label: string }[] = [
-  { key: 'recent_uploaded', label: 'Recently added' },
-  { key: 'most_loved', label: '❤️ Most loved' },
-  { key: 'recent_updated', label: 'Recently updated' },
-  { key: 'newest_taken', label: 'Newest taken' },
-  { key: 'oldest_taken', label: 'Oldest taken' },
-];
-
 const SHOW: { key: LibraryFilter; label: string }[] = [
   { key: 'all', label: 'All' },
   { key: 'needs_info', label: 'Needs info' },
@@ -50,18 +42,6 @@ export default function FilterSheet({
       footer={<Button block onClick={onClose}>Show photos</Button>}
     >
       <div className="flex flex-col gap-6">
-        <div>
-          <h4 className="mb-2.5 text-[13px] font-bold uppercase tracking-[0.06em] text-faint">Sort by</h4>
-          <div className="flex flex-wrap gap-2">
-            {SORTS.map((s) => (
-              <button key={s.key} onClick={() => onChange({ sort: s.key })}
-                className={clsx(chip, value.sort === s.key ? 'bg-ink text-white' : 'bg-chip text-body')}>
-                {s.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
         <div>
           <h4 className="mb-2.5 text-[13px] font-bold uppercase tracking-[0.06em] text-faint">Show</h4>
           <div className="flex flex-wrap gap-2">
