@@ -70,12 +70,11 @@ export default function DateEditor({
         {mode === 'year' && (
           <div>
             <input
-              autoFocus
               inputMode="numeric"
-              placeholder="e.g. 1975"
+              placeholder="Tap to enter a year"
               value={year}
               onChange={(e) => setYearVal(e.target.value, 'year')}
-              className={clsx(field, 'text-center text-[28px] font-extrabold tracking-wide')}
+              className={clsx(field, 'text-center text-[24px] font-extrabold tracking-wide')}
             />
             <p className="mt-2 text-center text-[14px] text-muted">Even just the year is a big help. Add the month or day later if you remember.</p>
           </div>
