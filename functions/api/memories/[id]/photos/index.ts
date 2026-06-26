@@ -11,7 +11,8 @@ interface PhotoRow {
   tone: string;
   width: number | null;
   height: number | null;
-  favorite: number;
+  like_count: number;
+  liked_by_me: number;
   date_label: string | null;
   date_confidence: string;
   location: string | null;
@@ -39,7 +40,8 @@ function summarize(p: PhotoRow) {
     tone: p.tone,
     width: p.width,
     height: p.height,
-    favorite: !!p.favorite,
+    likeCount: Number(p.like_count ?? 0),
+    likedByMe: !!p.liked_by_me,
     dateLabel: p.date_label,
     dateConfidence: p.date_confidence,
     hasDate,
@@ -60,6 +62,8 @@ export const onRequestGet = async (context: CFContext): Promise<Response> => {
   if (isNaN(id)) return jsonNoStore({ error: 'Invalid id' }, { status: 400 });
   const denied = requireMemoryAccess(context, id);
   if (denied) return denied;
+  const caller = await getCaller(context, id);
+  const callerId = caller?.id ?? 0; // 0 matches no contributor
 
   const url = new URL(context.request.url);
   const filter = url.searchParams.get('filter') ?? 'all';
@@ -104,7 +108,8 @@ export const onRequestGet = async (context: CFContext): Promise<Response> => {
       where.push(`(p.location IS NULL OR p.location = '')`);
       break;
     case 'favorites':
-      where.push('p.favorite = 1');
+      where.push('EXISTS (SELECT 1 FROM photo_likes pl WHERE pl.photo_id = p.id AND pl.contributor_id = ?)');
+      args.push(callerId);
       break;
     default:
       break;
@@ -142,21 +147,25 @@ export const onRequestGet = async (context: CFContext): Promise<Response> => {
     case 'recent_updated': orderBy = 'p.updated_at DESC, p.id DESC'; break;
     case 'oldest_taken': orderBy = 'p.date_sort IS NULL, p.date_sort ASC, p.id ASC'; break;
     case 'newest_taken': orderBy = 'p.date_sort IS NULL, p.date_sort DESC, p.id DESC'; break;
+    case 'most_loved': orderBy = 'like_count DESC, p.created_at DESC, p.id DESC'; break;
     default: orderBy = 'p.created_at DESC, p.id DESC'; break;
   }
 
+  // The liked_by_me subquery (callerId) is the first bound param because it appears first in SQL.
   const sql = `
-    SELECT p.id, p.thumb_key, p.tone, p.width, p.height, p.favorite,
+    SELECT p.id, p.thumb_key, p.tone, p.width, p.height,
            p.date_label, p.date_confidence, p.location, p.about, p.notes,
            p.created_at, p.updated_at,
            (SELECT COUNT(*) FROM photo_people pp WHERE pp.photo_id = p.id) AS people_count,
-           (SELECT COUNT(*) FROM photo_tags pt WHERE pt.photo_id = p.id) AS tag_count
+           (SELECT COUNT(*) FROM photo_tags pt WHERE pt.photo_id = p.id) AS tag_count,
+           (SELECT COUNT(*) FROM photo_likes pl WHERE pl.photo_id = p.id) AS like_count,
+           EXISTS (SELECT 1 FROM photo_likes pl WHERE pl.photo_id = p.id AND pl.contributor_id = ?) AS liked_by_me
       FROM photos p
      WHERE ${where.join(' AND ')}
      ORDER BY ${orderBy}
      LIMIT ? OFFSET ?`;
 
-  const rows = await all<PhotoRow>(context.env.DB, sql, ...args, limit + 1, offset);
+  const rows = await all<PhotoRow>(context.env.DB, sql, callerId, ...args, limit + 1, offset);
   const hasMore = rows.length > limit;
   const photos = rows.slice(0, limit).map(summarize);
   return jsonNoStore({ photos, nextOffset: hasMore ? offset + limit : null });
@@ -193,10 +202,11 @@ export const onRequestPost = async (context: CFContext): Promise<Response> => {
   // Duplicate detection — same bytes already in this memory.
   const dup = await first<PhotoRow>(
     context.env.DB,
-    `SELECT p.id, p.thumb_key, p.tone, p.width, p.height, p.favorite, p.date_label, p.date_confidence,
+    `SELECT p.id, p.thumb_key, p.tone, p.width, p.height, p.date_label, p.date_confidence,
             p.location, p.about, p.notes, p.created_at, p.updated_at,
             (SELECT COUNT(*) FROM photo_people pp WHERE pp.photo_id = p.id) AS people_count,
-            (SELECT COUNT(*) FROM photo_tags pt WHERE pt.photo_id = p.id) AS tag_count
+            (SELECT COUNT(*) FROM photo_tags pt WHERE pt.photo_id = p.id) AS tag_count,
+            (SELECT COUNT(*) FROM photo_likes pl WHERE pl.photo_id = p.id) AS like_count, 0 AS liked_by_me
        FROM photos p WHERE p.memory_id = ? AND p.content_hash = ?`,
     id,
     hash,
@@ -264,9 +274,9 @@ export const onRequestPost = async (context: CFContext): Promise<Response> => {
 
   const created = await first<PhotoRow>(
     context.env.DB,
-    `SELECT p.id, p.thumb_key, p.tone, p.width, p.height, p.favorite, p.date_label, p.date_confidence,
+    `SELECT p.id, p.thumb_key, p.tone, p.width, p.height, p.date_label, p.date_confidence,
             p.location, p.about, p.notes, p.created_at, p.updated_at,
-            0 AS people_count, 0 AS tag_count
+            0 AS people_count, 0 AS tag_count, 0 AS like_count, 0 AS liked_by_me
        FROM photos p WHERE p.id = ?`,
     photoId,
   );

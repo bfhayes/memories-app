@@ -13,6 +13,7 @@ export interface LibraryFilters {
 
 const SORTS: { key: LibrarySort; label: string }[] = [
   { key: 'recent_uploaded', label: 'Recently added' },
+  { key: 'most_loved', label: '❤️ Most loved' },
   { key: 'recent_updated', label: 'Recently updated' },
   { key: 'newest_taken', label: 'Newest taken' },
   { key: 'oldest_taken', label: 'Oldest taken' },

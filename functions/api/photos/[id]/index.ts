@@ -27,9 +27,13 @@ interface FullRow {
   updated_at: string;
 }
 
-async function getFull(db: D1Database, id: number) {
+async function getFull(db: D1Database, id: number, callerId: number) {
   const p = await first<FullRow>(db, 'SELECT * FROM photos WHERE id = ?', id);
   if (!p) return null;
+  const likeRow = await first<{ n: number }>(db, 'SELECT COUNT(*) AS n FROM photo_likes WHERE photo_id = ?', id);
+  const mineRow = await first<{ n: number }>(
+    db, 'SELECT COUNT(*) AS n FROM photo_likes WHERE photo_id = ? AND contributor_id = ?', id, callerId,
+  );
   const people = await all<{ id: number; name: string; accent: string }>(
     db,
     `SELECT pe.id, pe.name, pe.accent
@@ -56,7 +60,8 @@ async function getFull(db: D1Database, id: number) {
     tone: p.tone,
     width: p.width,
     height: p.height,
-    favorite: !!p.favorite,
+    likeCount: likeRow?.n ?? 0,
+    likedByMe: (mineRow?.n ?? 0) > 0,
     date: { value: p.date_value, confidence: p.date_confidence, label: p.date_label },
     location: p.location,
     about: p.about,
@@ -95,7 +100,8 @@ export const onRequestGet = async (context: CFContext): Promise<Response> => {
   const denied = requireMemoryAccess(context, memoryId);
   if (denied) return denied;
 
-  const full = await getFull(context.env.DB, id);
+  const caller = await getCaller(context, memoryId);
+  const full = await getFull(context.env.DB, id, caller?.id ?? 0);
   return jsonNoStore(full);
 };
 
@@ -151,13 +157,8 @@ export const onRequestPatch = async (context: CFContext): Promise<Response> => {
     await logActivity(db, { memoryId, photoId: id, caller, action: 'set_notes', detail: 'added a note' });
   }
 
-  if ('favorite' in body) {
-    const fav = body.favorite ? 1 : 0;
-    await run(db, 'UPDATE photos SET favorite=?, updated_at=? WHERE id=?', fav, nowIso(), id);
-  }
-
   if (caller) await touchContributor(db, caller.id);
-  const full = await getFull(db, id);
+  const full = await getFull(db, id, caller?.id ?? 0);
   return jsonNoStore(full);
 };
 

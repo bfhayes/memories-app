@@ -10,6 +10,7 @@ export default function PhotoGrid({
   selectMode = false,
   selectedIds,
   onToggle,
+  onToggleLike,
   hasNextPage,
   isFetchingNextPage,
   onLoadMore,
@@ -19,6 +20,7 @@ export default function PhotoGrid({
   selectMode?: boolean;
   selectedIds?: Set<number>;
   onToggle?: (id: number) => void;
+  onToggleLike?: (id: number, liked: boolean) => void;
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
   onLoadMore?: () => void;
@@ -48,6 +50,7 @@ export default function PhotoGrid({
             selectMode={selectMode}
             selected={selectedIds?.has(p.id)}
             onToggle={onToggle}
+            onToggleLike={onToggleLike}
           />
         ))}
       </div>

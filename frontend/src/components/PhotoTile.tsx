@@ -11,12 +11,14 @@ export default function PhotoTile({
   selectMode = false,
   selected = false,
   onToggle,
+  onToggleLike,
 }: {
   photo: PhotoSummary;
   memoryId: number;
   selectMode?: boolean;
   selected?: boolean;
   onToggle?: (id: number) => void;
+  onToggleLike?: (id: number, liked: boolean) => void;
 }) {
   const aspect = photo.width && photo.height ? `${photo.width} / ${photo.height}` : '1 / 1';
 
@@ -31,10 +33,22 @@ export default function PhotoTile({
     >
       <Photo src={photo.thumbUrl} tone={photo.tone} className="h-full w-full" />
 
-      {photo.favorite && (
-        <span className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-black/35 text-white backdrop-blur-[2px]">
-          <Heart size={15} fill="currentColor" />
-        </span>
+      {/* Like heart — tappable straight from the grid (doesn't open the photo). */}
+      {!selectMode && (
+        <button
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleLike?.(photo.id, photo.likedByMe); }}
+          aria-label={photo.likedByMe ? 'Remove love' : 'Love this photo'}
+          aria-pressed={photo.likedByMe}
+          className="absolute right-1.5 top-1.5 flex items-center gap-1 rounded-full bg-black/35 px-2 py-1.5 text-white backdrop-blur-[2px] transition active:scale-90"
+        >
+          <Heart
+            size={16}
+            strokeWidth={2.4}
+            className={photo.likedByMe ? 'text-terracotta' : 'text-white'}
+            fill={photo.likedByMe ? 'currentColor' : 'none'}
+          />
+          {photo.likeCount > 0 && <span className="text-[12px] font-bold leading-none">{photo.likeCount}</span>}
+        </button>
       )}
 
       <MissingBadge photo={photo} />

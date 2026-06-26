@@ -84,4 +84,10 @@ export const api = {
     request<{ tag: string }>(`/photos/${photoId}/tags`, { method: 'POST', body: JSON.stringify({ tag }) }),
   removeTag: (photoId: number, tag: string) =>
     request<{ ok: boolean }>(`/photos/${photoId}/tags`, { method: 'DELETE', body: JSON.stringify({ tag }) }),
+
+  // Likes ("loves") — per-contributor
+  likePhoto: (photoId: number) =>
+    request<{ likeCount: number; likedByMe: boolean }>(`/photos/${photoId}/like`, { method: 'POST' }),
+  unlikePhoto: (photoId: number) =>
+    request<{ likeCount: number; likedByMe: boolean }>(`/photos/${photoId}/like`, { method: 'DELETE' }),
 };

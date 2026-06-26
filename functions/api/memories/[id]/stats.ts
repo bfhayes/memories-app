@@ -1,6 +1,6 @@
 import { first, all } from '../../../lib/db';
 import { jsonNoStore } from '../../../lib/request';
-import { requireMemoryAccess } from '../../../lib/guard';
+import { requireMemoryAccess, getCaller } from '../../../lib/guard';
 import type { CFContext } from '../../../lib/env';
 
 interface Counts {
@@ -23,6 +23,8 @@ export const onRequestGet = async (context: CFContext): Promise<Response> => {
   if (isNaN(id)) return jsonNoStore({ error: 'Invalid id' }, { status: 400 });
   const denied = requireMemoryAccess(context, id);
   if (denied) return denied;
+  const caller = await getCaller(context, id);
+  const callerId = caller?.id ?? 0;
 
   const db = context.env.DB;
   const hasPeople = `EXISTS (SELECT 1 FROM photo_people pp WHERE pp.photo_id = p.id)`;
@@ -41,11 +43,12 @@ export const onRequestGet = async (context: CFContext): Promise<Response> => {
        SUM(CASE WHEN ${hasDate} THEN 1 ELSE 0 END) AS has_date,
        SUM(CASE WHEN ${hasPeople} THEN 1 ELSE 0 END) AS has_people,
        SUM(CASE WHEN ${hasStory} THEN 1 ELSE 0 END) AS has_story,
-       SUM(CASE WHEN p.favorite = 1 THEN 1 ELSE 0 END) AS favorites,
+       SUM(CASE WHEN EXISTS (SELECT 1 FROM photo_likes pl WHERE pl.photo_id = p.id AND pl.contributor_id = ?) THEN 1 ELSE 0 END) AS favorites,
        SUM(CASE WHEN (${hasDate}) AND (${hasPeople}) AND (${hasStory}) AND (${hasLoc}) THEN 0 ELSE 1 END) AS needs_info,
        SUM((CASE WHEN ${hasDate} THEN 1 ELSE 0 END) + (CASE WHEN ${hasPeople} THEN 1 ELSE 0 END)
          + (CASE WHEN ${hasStory} THEN 1 ELSE 0 END) + (CASE WHEN ${hasLoc} THEN 1 ELSE 0 END)) AS filled_fields
      FROM photos p WHERE p.memory_id = ?`,
+    callerId,
     id,
   );
 

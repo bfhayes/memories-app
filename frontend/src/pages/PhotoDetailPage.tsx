@@ -6,6 +6,7 @@ import { clsx } from 'clsx';
 import { useMemory } from '../context/MemoryContext';
 import { usePhoto, useSuggestions } from '../hooks/queries';
 import { usePhotoEditor } from '../hooks/usePhotoEditor';
+import { useLike } from '../hooks/useLike';
 import { useDebouncedCallback } from '../hooks/useDebouncedCallback';
 import { useToast } from '../context/ToastContext';
 import { api } from '../api/client';
@@ -58,6 +59,7 @@ export default function PhotoDetailPage() {
   const { data: photo, isLoading } = usePhoto(photoId);
   const { data: suggestions } = useSuggestions(memoryId);
   const editor = usePhotoEditor(photoId, memoryId);
+  const toggleLike = useLike(memoryId);
 
   const [dateOpen, setDateOpen] = useState(false);
   const [lightbox, setLightbox] = useState(false);
@@ -90,11 +92,13 @@ export default function PhotoDetailPage() {
         </button>
         <span className="text-[15px] font-bold text-faint">Photo</span>
         <button
-          onClick={() => editor.toggleFavorite(!photo.favorite)}
-          aria-label={photo.favorite ? 'Unfavorite' : 'Favorite'}
-          className={clsx('grid h-10 w-10 place-items-center rounded-full transition active:scale-90', photo.favorite ? 'text-terracotta' : 'text-muted2 hover:text-ink')}
+          onClick={() => toggleLike(photoId, photo.likedByMe)}
+          aria-label={photo.likedByMe ? 'Remove love' : 'Love this photo'}
+          aria-pressed={photo.likedByMe}
+          className={clsx('flex h-10 items-center gap-1.5 rounded-full px-2.5 transition active:scale-90', photo.likedByMe ? 'text-terracotta' : 'text-muted2 hover:text-ink')}
         >
-          <Heart size={24} fill={photo.favorite ? 'currentColor' : 'none'} strokeWidth={2.2} />
+          <Heart size={24} fill={photo.likedByMe ? 'currentColor' : 'none'} strokeWidth={2.2} />
+          {photo.likeCount > 0 && <span className="text-[16px] font-extrabold">{photo.likeCount}</span>}
         </button>
       </header>
 

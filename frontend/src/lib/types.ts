@@ -32,7 +32,8 @@ export interface PhotoSummary {
   tone: string;
   width: number | null;
   height: number | null;
-  favorite: boolean;
+  likeCount: number;
+  likedByMe: boolean;
   dateLabel: string | null;
   dateConfidence: DateConfidence;
   hasDate: boolean;
@@ -74,7 +75,8 @@ export interface PhotoDetail {
   tone: string;
   width: number | null;
   height: number | null;
-  favorite: boolean;
+  likeCount: number;
+  likedByMe: boolean;
   date: PhotoDate;
   location: string | null;
   about: string | null;
@@ -129,4 +131,5 @@ export type LibrarySort =
   | 'recent_uploaded'
   | 'recent_updated'
   | 'oldest_taken'
-  | 'newest_taken';
+  | 'newest_taken'
+  | 'most_loved';

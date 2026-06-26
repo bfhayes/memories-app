@@ -73,9 +73,6 @@ export function usePhotoEditor(photoId: number, memoryId: number) {
         () => api.patchPhoto(photoId, { notes }),
       ),
 
-    toggleFavorite: (favorite: boolean) =>
-      run(() => patchCache((p) => ({ ...p, favorite })), () => api.patchPhoto(photoId, { favorite })),
-
     addPerson: (name: string) =>
       run(null, async () => {
         await api.addPerson(photoId, name);

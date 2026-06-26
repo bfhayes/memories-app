@@ -4,6 +4,7 @@ import { Search, SlidersHorizontal, CheckSquare, ImagePlus, X } from 'lucide-rea
 import { clsx } from 'clsx';
 import { useMemory } from '../context/MemoryContext';
 import { usePhotosInfinite, useStats, useSuggestions } from '../hooks/queries';
+import { useLike } from '../hooks/useLike';
 import { useDebouncedCallback } from '../hooks/useDebouncedCallback';
 import { decadeLabel } from '../lib/format';
 import PhotoGrid from '../components/PhotoGrid';
@@ -47,6 +48,7 @@ export default function LibraryPage() {
 
   const { data: stats } = useStats(memoryId);
   const { data: suggestions } = useSuggestions(memoryId);
+  const toggleLike = useLike(memoryId);
   const query = usePhotosInfinite(memoryId, {
     filter: filters.filter,
     sort: filters.sort,
@@ -117,6 +119,7 @@ export default function LibraryPage() {
           selectMode={selectMode}
           selectedIds={selected}
           onToggle={toggle}
+          onToggleLike={toggleLike}
           hasNextPage={query.hasNextPage}
           isFetchingNextPage={query.isFetchingNextPage}
           onLoadMore={() => query.fetchNextPage()}
