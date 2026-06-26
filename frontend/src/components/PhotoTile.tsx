@@ -27,15 +27,17 @@ export default function PhotoTile({
 
   const inner = (
     <div
-      className={clsx(
-        'relative w-full overflow-hidden rounded-[16px] bg-sand transition',
-        selected && 'ring-[3px] ring-terracotta ring-offset-2 ring-offset-page',
-      )}
+      className="relative w-full overflow-hidden rounded-[16px] bg-sand"
       style={{ paddingBottom: `${pad}%` }}
     >
       <div className="absolute inset-0">
         <Photo src={photo.thumbUrl} tone={photo.tone} className="h-full w-full" />
       </div>
+
+      {/* Selection outline drawn as a bordered overlay (no box-shadow ring — Safari-friendlier). */}
+      {selected && (
+        <span className="pointer-events-none absolute inset-0 rounded-[16px] border-[3px] border-terracotta" />
+      )}
 
       {/* Like heart — tappable straight from the grid (doesn't open the photo). */}
       {!selectMode && (
@@ -75,7 +77,7 @@ export default function PhotoTile({
     <Link
       to={`/m/${memoryId}/photo/${photo.id}`}
       onClick={(e) => { if (selectMode) { e.preventDefault(); onToggle?.(photo.id); } }}
-      className="mb-2.5 block break-inside-avoid active:scale-[0.99]"
+      className="mb-2.5 block active:scale-[0.99]"
     >
       {inner}
     </Link>
