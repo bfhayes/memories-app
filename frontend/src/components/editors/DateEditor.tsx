@@ -82,23 +82,33 @@ export default function DateEditor({
         )}
 
         {mode === 'month-year' && (
-          <div className="flex gap-2.5">
-            <select
-              className={clsx(field, 'flex-1')}
-              value={month}
-              onChange={(e) => { setMonth(e.target.value); emit('month-year', year ? `${year}-${e.target.value}` : ''); }}
-            >
-              {MONTHS.map((mn, i) => (
-                <option key={mn} value={String(i + 1).padStart(2, '0')}>{mn}</option>
-              ))}
-            </select>
+          <div>
             <input
-              className={clsx(field, 'w-28 text-center')}
               inputMode="numeric"
               placeholder="Year"
               value={year}
               onChange={(e) => setYearVal(e.target.value, 'month-year')}
+              className={clsx(field, 'text-center text-[22px] font-extrabold tracking-wide')}
             />
+            <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6">
+              {MONTHS.map((mn, i) => {
+                const mv = String(i + 1).padStart(2, '0');
+                const active = month === mv;
+                return (
+                  <button
+                    key={mn}
+                    onClick={() => { setMonth(mv); emit('month-year', year ? `${year}-${mv}` : ''); }}
+                    className={clsx(
+                      'rounded-[12px] py-2.5 text-[15px] font-bold transition active:scale-95',
+                      active ? 'bg-terracotta text-white' : 'bg-chip text-body',
+                    )}
+                  >
+                    {mn.slice(0, 3)}
+                  </button>
+                );
+              })}
+            </div>
+            {!year && <p className="mt-2 text-[14px] text-muted">Enter the year, then pick the month.</p>}
           </div>
         )}
 
