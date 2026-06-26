@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { X, ChevronRight, Dices } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Dices } from 'lucide-react';
 import { useMemory } from '../context/MemoryContext';
 import { useStats } from '../hooks/queries';
 import { MISSIONS } from '../lib/missions';
@@ -23,11 +23,8 @@ export default function DetectiveHomePage() {
 
   return (
     <div className="mx-auto min-h-[100dvh] max-w-xl px-5 pb-16 pt-4 safe-top sm:px-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center">
         <span className="text-[14px] font-bold uppercase tracking-[0.08em] text-sage">🔍 Photo Detective</span>
-        <button onClick={() => navigate(`/m/${memoryId}/library`)} aria-label="Close" className="grid h-10 w-10 place-items-center rounded-full bg-chip text-muted hover:text-ink active:scale-95">
-          <X size={20} strokeWidth={2.4} />
-        </button>
       </div>
 
       <header className="mt-5">
@@ -81,6 +78,10 @@ export default function DetectiveHomePage() {
               🔥 {stats.completion}% complete · {stats.total.toLocaleString()} photos in this memory
             </footer>
           )}
+
+          <Button block variant="outline" className="mt-6" onClick={() => navigate(`/m/${memoryId}/library`)}>
+            <ChevronLeft size={20} /> Back to Library
+          </Button>
         </>
       )}
     </div>
