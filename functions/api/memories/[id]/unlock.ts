@@ -1,6 +1,6 @@
 import { first, run, nowIso } from '../../../lib/db';
 import { parseJsonBody, jsonNoStore } from '../../../lib/request';
-import { verifyPassword, accessCookie, isSecure } from '../../../lib/auth';
+import { verifyPassword, hashPassword, accessCookie, isSecure } from '../../../lib/auth';
 import type { CFContext } from '../../../lib/env';
 
 const MAX_ATTEMPTS = 8;
@@ -46,8 +46,8 @@ export const onRequestPost = async (context: CFContext): Promise<Response> => {
     );
   }
 
-  const ok = await verifyPassword(password, m.password_hash, context.env.AUTH_SECRET);
-  if (!ok) {
+  const result = await verifyPassword(password, m.password_hash, context.env.AUTH_SECRET);
+  if (!result.ok) {
     await run(
       context.env.DB,
       'INSERT INTO unlock_attempts (memory_id, ip, created_at) VALUES (?, ?, ?)',
@@ -56,6 +56,17 @@ export const onRequestPost = async (context: CFContext): Promise<Response> => {
       nowIso(),
     );
     return jsonNoStore({ error: 'That password doesn’t match' }, { status: 401 });
+  }
+
+  // Upgrade an old-scheme hash so case/space variants work from now on.
+  if (result.rehash) {
+    await run(
+      context.env.DB,
+      'UPDATE memories SET password_hash = ?, updated_at = ? WHERE id = ?',
+      await hashPassword(password, context.env.AUTH_SECRET),
+      nowIso(),
+      id,
+    );
   }
 
   // Correct password — clear any recorded attempts for this (memory, ip).

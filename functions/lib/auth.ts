@@ -7,24 +7,46 @@ function secretKey(secret: string): Uint8Array {
   return new TextEncoder().encode(secret);
 }
 
-/** Hash a Memory password with the app secret as salt. Returns hex. */
-export async function hashPassword(password: string, secret: string): Promise<string> {
-  const data = new TextEncoder().encode(`${secret}:${password.trim()}`);
-  const digest = await crypto.subtle.digest('SHA-256', data);
+// Forgiving normalization so "Uncle Jeff", "uncle jeff" and "unclejeff" all match: lowercase and
+// drop all whitespace. Friendlier for non-technical family typing a texted password.
+function normalizePassword(p: string): string {
+  return p.toLowerCase().replace(/\s+/g, '');
+}
+
+async function sha256Hex(input: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
+/** Hash a Memory password (normalized) with the app secret as salt. Returns hex. */
+export async function hashPassword(password: string, secret: string): Promise<string> {
+  return sha256Hex(`${secret}:${normalizePassword(password)}`);
+}
+
+/** The old hash scheme (trim only) — kept so existing passwords still unlock and can be upgraded. */
+async function hashPasswordLegacy(password: string, secret: string): Promise<string> {
+  return sha256Hex(`${secret}:${password.trim()}`);
+}
+
+function timingSafeEqualHex(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
+}
+
+/**
+ * Verify a password against a stored hash. `rehash` is true when it only matched the OLD (trim-only)
+ * scheme — the caller should re-store `hashPassword(password)` so future case/space variants work.
+ */
 export async function verifyPassword(
   password: string,
   hash: string,
   secret: string,
-): Promise<boolean> {
-  const candidate = await hashPassword(password, secret);
-  // Length-equal, content-compared — inputs are server-controlled hex of fixed length.
-  if (candidate.length !== hash.length) return false;
-  let diff = 0;
-  for (let i = 0; i < candidate.length; i++) diff |= candidate.charCodeAt(i) ^ hash.charCodeAt(i);
-  return diff === 0;
+): Promise<{ ok: boolean; rehash: boolean }> {
+  if (timingSafeEqualHex(await hashPassword(password, secret), hash)) return { ok: true, rehash: false };
+  if (timingSafeEqualHex(await hashPasswordLegacy(password, secret), hash)) return { ok: true, rehash: true };
+  return { ok: false, rehash: false };
 }
 
 /** Read the unlocked-memory ids from the signed access cookie. Never throws. */
