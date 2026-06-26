@@ -18,7 +18,9 @@ export const onRequestGet = async (context: CFContext): Promise<Response> => {
   const headers = new Headers();
   obj.writeHttpMetadata(headers);
   headers.set('etag', obj.httpEtag);
-  headers.set('cache-control', 'public, max-age=31536000, immutable');
+  // `private` so the browser (and our service worker) caches per-device, but the shared CDN edge
+  // does NOT — otherwise a cached object would be served to anyone, bypassing the access gate above.
+  headers.set('cache-control', 'private, max-age=31536000, immutable');
   headers.set('X-Content-Type-Options', 'nosniff');
   return new Response(obj.body, { headers });
 };

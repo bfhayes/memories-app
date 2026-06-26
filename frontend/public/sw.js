@@ -1,5 +1,5 @@
 // Memories service worker — network-first for API + navigations, cache-first for static assets.
-const CACHE = 'memories-v8';
+const CACHE = 'memories-v9';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();
