@@ -12,7 +12,6 @@ import DetectiveHomePage from './pages/DetectiveHomePage';
 import DetectivePlayPage from './pages/DetectivePlayPage';
 import DetectiveDonePage from './pages/DetectiveDonePage';
 import NotFoundPage from './pages/NotFoundPage';
-import CreateMemoryPage from './pages/CreateMemoryPage';
 import ErrorBoundary from './components/ErrorBoundary';
 
 function FullLoader() {
@@ -49,7 +48,8 @@ export default function App() {
     <ErrorBoundary>
       <Routes>
         <Route path="/" element={<HubPage />} />
-        <Route path="/new" element={<CreateMemoryPage />} />
+        {/* "Create a memory" is intentionally disabled — CreateMemoryPage stays for easy re-enable. */}
+        <Route path="/new" element={<Navigate to="/" replace />} />
         <Route path="/m/:memoryId" element={<MemoryShell />}>
           <Route index element={<HomePage />} />
           <Route path="upload" element={<UploadPage />} />

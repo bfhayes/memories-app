@@ -1,8 +1,7 @@
 import { Link } from 'react-router-dom';
-import { Lock, Plus } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import { useMemories } from '../hooks/queries';
 import Brand from '../components/Brand';
-import Button from '../components/ui/Button';
 import Photo from '../components/ui/Photo';
 import Spinner from '../components/ui/Spinner';
 import EmptyState from '../components/ui/EmptyState';
@@ -55,24 +54,14 @@ export default function HubPage() {
         {isLoading ? (
           <div className="grid place-items-center py-16 text-terracotta"><Spinner size={28} /></div>
         ) : !memories || memories.length === 0 ? (
-          <EmptyState
-            glyph="🖼️"
-            title="No memories yet"
-            action={<Link to="/new"><Button><Plus size={20} strokeWidth={2.6} /> Create a new memory</Button></Link>}
-          >
-            Start your first memory and invite the family to fill it in together.
+          <EmptyState glyph="🖼️" title="No memories yet">
+            Your family memories will appear here.
           </EmptyState>
         ) : (
           <div className="flex flex-col gap-3">
             {memories.map((m) => (
               <MemoryCard key={m.id} memory={m} />
             ))}
-            <Link
-              to="/new"
-              className="group flex items-center justify-center gap-2 rounded-[22px] border-2 border-dashed border-line p-5 text-[19px] font-extrabold text-muted transition active:scale-[0.99] hover:border-terracotta hover:text-terracotta"
-            >
-              <Plus size={22} strokeWidth={2.6} /> Create a new memory
-            </Link>
           </div>
         )}
       </main>
